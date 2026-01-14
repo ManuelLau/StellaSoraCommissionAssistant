@@ -1,0 +1,384 @@
+{
+	"$__mpe_config_Commission": {
+		"$__mpe_code": {
+			"prefix": "",
+			"savedViewport": {
+				"x": -88,
+				"y": 305,
+				"zoom": 0.99
+			},
+			"filename": "Commission",
+			"version": "v0.15.2"
+		}
+	},
+	"Commission@ClickEntryButton": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"roi": [1100, 0, 180, 180],
+				"template": ["CommissionButton.png"],
+				"green_mask": true
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"post_delay": 1000,
+		"$__mpe_code": {
+			"position": {
+				"x": 413,
+				"y": -490
+			}
+		}
+	},
+	"Commission@Swipe": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "Swipe",
+			"param": {
+				"begin": [300, 500, 1, 1],
+				"end": [[300, 300, 1, 1]]
+			}
+		},
+		"max_hit": 4,
+		"$__mpe_code": {
+			"position": {
+				"x": 300,
+				"y": 248
+			}
+		},
+		"next": ["Commission@RecogniseLabelAgain", "Commission@GoToNextClass"]
+	},
+	"Commission@GetCompleteTime": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"timeout": 2000,
+		"$__mpe_code": {
+			"position": {
+				"x": 0,
+				"y": 35
+			}
+		},
+		"next": ["Commission@RecogniseLabelFirst", {
+			"name": "Commission@Swipe",
+			"jump_back": true
+		}]
+	},
+	"Commission@RecogniseTitle": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["CommissionTitle.png"]
+			}
+		},
+		"action": {
+			"type": "StopTask",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 413,
+				"y": -662
+			}
+		}
+	},
+	"CommissionEnter": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 138,
+				"y": -534
+			}
+		},
+		"next": ["Commission@RecogniseTitle", {
+			"name": "Commission@ClickEntryButton",
+			"jump_back": true
+		}]
+	},
+	"Commission@RecogniseRemainingTime": {
+		"recognition": {
+			"type": "OCR",
+			"param": {
+				"roi": [942, 470, 140, 44],
+				"expected": ["委托中", "已完成"],
+				"replace": [["'", ""]]
+			}
+		},
+		"action": {
+			"type": "Custom",
+			"param": {
+				"custom_action": "CustomRecogniseRemainingTime"
+			}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 863,
+				"y": -47
+			}
+		},
+		"next": ["Commission@End"]
+	},
+	"Commission@Incomplete": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"roi": [1040, 590, 240, 100],
+				"template": ["CommissionClaimAllNo.png"]
+			}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 974,
+				"y": -593
+			}
+		},
+		"next": ["Commission@GetCompleteTime"]
+	},
+	"Commission@RecogniseLabelFirst": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["Commissioning0.png", "Commissioning1.png"],
+				"roi": [104, 0, 350, 720]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"doc": "识别左侧状态图标来判断是否已完成",
+		"$__mpe_code": {
+			"position": {
+				"x": 408,
+				"y": -20
+			}
+		},
+		"next": ["Commission@RecogniseRemainingTime"]
+	},
+	"Commission@GoToNextClass": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["CommissionClassButton.png"],
+				"roi": [23, 81, 90, 554],
+				"threshold": [0.95]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {
+				"target_offset": [10, 100, 0, 0]
+			}
+		},
+		"post_delay": 1000,
+		"$__mpe_code": {
+			"position": {
+				"x": 571,
+				"y": 469
+			}
+		}
+	},
+	"CommissionCheckState": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 696,
+				"y": -457
+			}
+		},
+		"next": ["Commission@Incomplete", "Commission@Complete"]
+	},
+	"Commission@Complete": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"roi": [1040, 590, 240, 100],
+				"template": ["CommissionClaimAllYes.png"]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"post_delay": 4000,
+		"$__mpe_code": {
+			"position": {
+				"x": 976,
+				"y": -377
+			}
+		},
+		"next": ["Commission@End", {
+			"name": "Commission@SkipDialogue",
+			"jump_back": true
+		},
+		{
+			"name": "ObtainReward",
+			"jump_back": true
+		},
+		{
+			"name": "Commission@RecogniseDispatchAgain",
+			"jump_back": true
+		}]
+	},
+	"Commission@RecogniseDispatchAgain": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["CommissionDispatchAgain.png"],
+				"roi": [620, 490, 320, 200]
+			}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 1303,
+				"y": -31
+			}
+		},
+		"next": ["Commission@RecogniseLastTaskDuration"]
+	},
+	"Commission@SkipDialogue": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["Skip.png"],
+				"green_mask": true
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"post_delay": 1000,
+		"$__mpe_code": {
+			"position": {
+				"x": 1408,
+				"y": -354
+			}
+		}
+	},
+	"$__mpe_external_ObtainReward_Commission": {
+		"$__mpe_code": {
+			"position": {
+				"x": 1415,
+				"y": -100
+			}
+		}
+	},
+	"Commission@End": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["CommissionTitle.png"],
+				"threshold": [0.9]
+			}
+		},
+		"action": {
+			"type": "Custom",
+			"param": {
+				"custom_action": "CustomCreateCommissionTaskChain"
+			}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 1406,
+				"y": -568
+			}
+		}
+	},
+	"Commission@DispatchAgain": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["CommissionDispatchAgain.png"],
+				"roi": [620, 490, 320, 200]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"post_delay": 2000,
+		"$__mpe_code": {
+			"position": {
+				"x": 1836,
+				"y": -32
+			}
+		}
+	},
+	"Commission@RecogniseLabelAgain": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["Commissioning0.png", "Commissioning1.png"],
+				"roi": [104, 0, 350, 720]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 575,
+				"y": 250
+			}
+		},
+		"next": ["Commission@RecogniseRemainingTime"]
+	},
+	"Commission@RecogniseLastTaskDuration": {
+		"recognition": {
+			"type": "OCR",
+			"param": {
+				"roi": [900, 150, 150, 370],
+				"order_by": "Vertical",
+				"expected": ["小时"],
+				"replace": [["'", ""]]
+			}
+		},
+		"action": {
+			"type": "Custom",
+			"param": {
+				"custom_action": "CustomRecogniseLastTaskDuration"
+			}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 1571,
+				"y": -31
+			}
+		},
+		"next": ["Commission@DispatchAgain"]
+	}
+}

@@ -1,0 +1,73 @@
+{
+	"$__mpe_config_Utility": {
+		"$__mpe_code": {
+			"prefix": "",
+			"savedViewport": {
+				"x": -314,
+				"y": -473,
+				"zoom": 1.59
+			},
+			"filename": "Utility",
+			"version": "v0.15.2"
+		}
+	},
+	"ObtainReward": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"roi": [0, 500, 0, 220],
+				"template": ["ClickToReceive.png", "ClickToContinue.png"],
+				"green_mask": true
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {
+				"target": [640, 600, 10, 10]
+			}
+		},
+		"post_delay": 1000,
+		"doc": "关闭一切获得奖励的界面，包括月卡奖励等",
+		"$__mpe_code": {
+			"position": {
+				"x": 349,
+				"y": 485
+			}
+		}
+	},
+	"ClickConfirmButton": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["ConfirmButton.png"],
+				"roi": [304, 146, 672, 420]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 604,
+				"y": 486
+			}
+		}
+	},
+	"StopTask": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "StopTask",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 853,
+				"y": 496
+			}
+		}
+	}
+}

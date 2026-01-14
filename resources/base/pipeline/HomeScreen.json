@@ -1,0 +1,171 @@
+{
+	"HomeScreen": {
+		"next": [
+            "HomeScreen@RecogniseMenuButton",
+            "[JumpBack]HomeScreen@ClickHomeButton",
+            "[JumpBack]HomeScreen@ClickToEnterGame",
+            "[JumpBack]ObtainReward",
+            "[JumpBack]HomeScreen@WaitLoading",
+            "[JumpBack]HomeScreen@UpdatePopup",
+            "HomeScreen@MaintenancePopup",
+            "[JumpBack]HomeScreen@ClosePopup"
+        ]
+	},
+	"HomeScreen@RecogniseMenuButton": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["MenuButton.png"],
+				"roi": [1180, 0, 100, 100],
+				"threshold": 0.9
+			}
+		},
+        "post_delay": 1000,
+        "next": "HomeScreen@RecogniseMenuButtonAgain",
+        "timeout": 2000,
+        "on_error": "HomeScreen"
+	},
+    "HomeScreen@RecogniseMenuButtonAgain": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["MenuButton.png"],
+				"roi": [1180, 0, 100, 100],
+				"threshold": 0.9
+			}
+		},
+		"action": {
+			"type": "StopTask"
+		}
+	},
+	"HomeScreen@ClickHomeButton": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["HomeButton0.png", "HomeButton1.png"],
+				"roi": [0,0,500,100],
+				"threshold": 0.9
+			}
+		},
+		"action": {
+			"type": "Click"
+		},
+		"post_delay": 1000
+	},
+	"HomeScreen@ClickToEnterGame": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["ClickToEnterGame.png"]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {
+				"target": [640, 584, 10, 10]
+			}
+		},
+		"post_delay": 1000
+	},
+	"HomeScreen@WaitLoading": {
+		"recognition": {
+			"type": "OCR",
+			"param": {
+				"expected": ["初始化", "加载中", "更新资源中"],
+				"roi": [0, 500, 0, 220]
+			}
+		},
+		"post_delay": 1000
+	},
+	"HomeScreen@UpdatePopup": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["UpdatePopup.png"],
+				"roi": [370, 220, 554, 236]
+			}
+		},
+		"next": "ClickConfirmButton"
+	},
+	"HomeScreen@MaintenancePopup": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["MaintenancePopup.png"],
+				"roi": [370, 220, 554, 236]
+			}
+		},
+		"next": "HomeScreen@MaintenanceDelayTaskChain"
+	},
+	"HomeScreen@MaintenanceDelayTaskChain": {
+		"recognition": {
+			"type": "OCR",
+			"param": {
+				"expected": ["-"],
+				"roi": [370, 220, 554, 236],
+				"replace": ["'", ""]
+			}
+		},
+		"action": {
+			"type": "Custom",
+			"param": {
+				"custom_action": "CustomMaintenanceDelayTaskChain"
+			}
+		},
+		"next": "HomeScreen@MaintenanceClickConfirmButton"
+	},
+	"HomeScreen@MaintenanceClickConfirmButton": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["ConfirmButton.png"],
+				"roi": [304, 146, 672, 420]
+			}
+		},
+		"action": {
+			"type": "Click"
+		},
+		"next": "HomeScreen@LoginScreenExitGame"
+	},
+	"HomeScreen@LoginScreenExitGame": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["LoginScreenExit.png"],
+				"roi": [0, 520, 200, 200],
+				"green_mask": true
+			}
+		},
+		"action": {
+			"type": "Click"
+		},
+		"next": "HomeScreen@ExitGameConfirm"
+	},
+	"HomeScreen@ExitGameConfirm": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["ConfirmButton.png"],
+				"roi": [304, 146, 672, 420]
+			}
+		},
+		"action": {
+			"type": "Click"
+		},
+		"next": "StopTask"
+	},
+	"HomeScreen@ClosePopup": {
+        "recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["Close0.png","Close1.png","Close2.png","CloseGreenMask.png"]
+			},
+    		"green_mask": true
+		},
+		"action": {
+			"type": "Click"
+		},
+		"post_delay": 1000,
+        "doc": "关闭一切弹窗，包括每日签到界面、氪金礼包弹窗"
+	}
+}

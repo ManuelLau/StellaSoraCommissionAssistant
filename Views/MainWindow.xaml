@@ -1,0 +1,129 @@
+﻿<hc:Window x:Class="StellaSoraCommissionAssistant.Views.MainWindow"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:hc="https://handyorg.github.io/handycontrol"
+           xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+           xmlns:models="clr-namespace:StellaSoraCommissionAssistant.Models"
+           xmlns:utilities="clr-namespace:StellaSoraCommissionAssistant.Utilities"
+           xmlns:viewmodels="clr-namespace:StellaSoraCommissionAssistant.ViewModels"
+           xmlns:views="clr-namespace:StellaSoraCommissionAssistant.Views"
+           mc:Ignorable="d"
+           d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+           Icon="/StellaSoraCommissionAssistant;component/resources/AppIcon.ico" 
+           Title="星塔旅人委托小助手" Background="White"
+           Height="520" Width="700" MinHeight="520" MinWidth="700">
+
+    <hc:Window.Resources>
+        <utilities:TaskStatusToColorConverter x:Key="TaskStatusToColorConverter" />
+        <utilities:LogItemColorConverter x:Key="LogItemColorConverter" />
+    </hc:Window.Resources>
+
+    <hc:Window.NonClientAreaContent>
+        <Grid HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" IsHitTestVisible="False"
+            HorizontalAlignment="Left" Orientation="Horizontal">
+                <TextBlock Text="-" VerticalAlignment="Center" Foreground="Gray" IsHitTestVisible="False" Margin="6 0 6 0"/>
+                <TextBlock Text="{Binding Source={x:Static utilities:Constants.AppVersion}, StringFormat='v{0}'}"
+                       VerticalAlignment="Center" Foreground="Gray" IsHitTestVisible="False"/>
+            </StackPanel>
+        </Grid>
+    </hc:Window.NonClientAreaContent>
+
+    <Grid>
+        <DockPanel>
+            <TabControl Style="{StaticResource TabControlInLine}">
+                <TabItem Header="主页" IsSelected="True">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="330"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Margin="0 0 0 0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition />
+                                <RowDefinition Height="60" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="任务列表" HorizontalAlignment="Center" FontSize="16" VerticalAlignment="Center"/>
+
+                            <ListBox Grid.Row="1" Margin="4 4 4 0" BorderThickness="1" ScrollViewer.CanContentScroll="False"
+                                hc:ScrollViewerAttach.AutoHide="False" hc:ScrollViewer.IsInertiaEnabled="True"
+                                ItemsSource="{Binding WaitingTaskList}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Height="36"
+                                            IsEnabled="{c:Binding 'Status == models:ETaskChainStatus.Waiting'}">
+                                            <Ellipse Width="10" Height="10"
+                                                Fill="{Binding Status, Converter={StaticResource TaskStatusToColorConverter}}"/>
+                                            <hc:SimpleText Width="116" Margin="6 0 0 0" TextWrapping="Wrap"
+                                                Text="{Binding Name}" VerticalAlignment="Center"/>
+                                            <TextBox Text="{Binding ExecuteDateTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="140"  Margin="0 0 0 0"
+                                                HorizontalContentAlignment="Center" HorizontalAlignment="Center"
+                                                FontSize="12" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                                            <Button Width="28" Height="28" Margin="0 0 0 0"
+                                                Style="{StaticResource ButtonIcon.Small}" Foreground="Red"
+                                                hc:IconElement.Geometry="{StaticResource CloseGeometry}"
+                                                Click="DeleteTaskChain"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <StaticResource ResourceKey="ListBoxItemStyle"/>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Button Content="启动任务" Width="90" Height="40" Margin="10 0 10 0"
+                                    Foreground="{DynamicResource BlackColor}"
+                                    Visibility="{c:Binding !ProgramData.IsAfkTaskRunning}"
+                                    VerticalContentAlignment="Center" Command="{Binding StartTaskButtonCommand}"
+                                    IsEnabled="{c:Binding !ProgramData.IsCheckingNewVersion and !ProgramData.IsDownloadingFiles}"/>
+
+                                <Button Content="停止任务" Width="90" Height="40" Margin="10 0 10 0"
+                                    Foreground="{DynamicResource BlackColor}"
+                                    Visibility="{c:Binding ProgramData.IsAfkTaskRunning}"
+                                    IsEnabled="{c:Binding !IsStoppingCurrentTask}"
+                                    VerticalContentAlignment="Center" Command="{Binding StopTaskButtonCommand}"/>
+
+                                <Button Content="{c:Binding 'WaitingTaskList.Count > 0 ? RefreshTaskButtonText : CreateTaskButtonText'}"
+                                    Width="90" Height="40" Margin="10 0 10 0"
+                                    IsEnabled="{c:Binding !ProgramData.IsAfkTaskRunning}"
+                                    VerticalContentAlignment="Center" Command="{Binding CreateButtonCommand}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <hc:ScrollViewer Grid.Column="1" Margin="4 10 8 10" VerticalAlignment="Top" VerticalContentAlignment="Top"
+                            HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True"
+                            hc:ScrollViewerAttach.AutoHide="False" utilities:AutoScrollToBottom.AlwaysScrollToBottom="True">
+                            <ItemsControl ItemsSource="{Binding LogDataList}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="10 3 0 3" TextWrapping="Wrap">
+                                            <Run Text="{Binding DateTime}" Foreground="Gray"/>
+                                            <Run Text="{Binding Content}" 
+                                                Foreground="{Binding IsRed, Converter={StaticResource LogItemColorConverter}}"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </hc:ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="设置" IsSelected="False">
+                    <Border>
+                        <views:SettingsView/>
+                    </Border>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </Grid>
+</hc:Window>

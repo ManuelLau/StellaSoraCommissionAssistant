@@ -1,0 +1,17 @@
+﻿<Application x:Class="StellaSoraCommissionAssistant.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:StellaSoraCommissionAssistant"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             StartupUri="Views/MainWindow.xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <hc:ThemeResources/>
+                <hc:Theme/>
+                <ResourceDictionary Source="/StellaSoraCommissionAssistant;component/Style.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
