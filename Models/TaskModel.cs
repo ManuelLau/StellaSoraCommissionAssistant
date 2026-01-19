@@ -5,25 +5,19 @@ public enum ETaskType
 {
     Normal = 0,
     HomeScreen,
-    Commission,
+    CommissionEnter,
+    CommissionCheckState,
+    FriendsEnergy,
     RestartGame,
 }
 
 //单个Pipeline任务
-public class TaskModel
+/// <summary>不需要的string用string.Empty</summary>
+public class TaskModel(string name, string entry, string pipelineOverride, ETaskType type)
 {
-    public string Name;
+    public string Name = name;
     /// <summary>可以根据Entry是否为empty来判断是哪种类型任务</summary>
-    public string Entry { get; set; }
-    public string PipelineOverride { get; set; }
-    public ETaskType Type { get; set; }
-
-    /// <summary>不需要的string用string.Empty</summary>
-    public TaskModel(string name, string entry, string pipelineOverride, ETaskType type)
-    {
-        Name = name;
-        Entry = entry;
-        PipelineOverride = pipelineOverride;
-        Type = type;
-    }
+    public string Entry { get; set; } = entry;
+    public string PipelineOverride { get; set; } = pipelineOverride;
+    public ETaskType Type { get; set; } = type;
 }

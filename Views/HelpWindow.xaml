@@ -3,13 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:models="clr-namespace:StellaSoraCommissionAssistant.Models"
-        xmlns:md="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=models:ProgramDataModel}"
         WindowStartupLocation="CenterScreen"
         Title="使用说明" Height="800" Width="1000">
     <Grid>
-        <md:MarkdownViewer x:Name="markdownViewer" Margin="4"/>
+        <wv2:WebView2 x:Name="webView" Margin="4"/>
     </Grid>
 </Window>

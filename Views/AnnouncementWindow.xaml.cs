@@ -1,4 +1,5 @@
-﻿using StellaSoraCommissionAssistant.Models;
+﻿using Microsoft.Web.WebView2.Core;
+using StellaSoraCommissionAssistant.Models;
 using StellaSoraCommissionAssistant.Utilities;
 using StellaSoraCommissionAssistant.ViewModels;
 using System.Windows;
@@ -11,15 +12,34 @@ public partial class AnnouncementWindow : Window
     {
         InitializeComponent();
         DataContext = ProgramDataModel.Instance;
+        webView.CoreWebView2InitializationCompleted += CoreWebView2InitializationCompleted;
+        webView.EnsureCoreWebView2Async();
+    }
 
-        MainTitle.Text = AnnouncementContent.MainTitle;
-        LatestUpdateTitle.Text = AnnouncementContent.LatestUpdateTitle;
-        LatestUpdateContent.Text = AnnouncementContent.LatestUpdateContent;
-        NotesTitle.Text = AnnouncementContent.NotesTitle;
-        NotesContent.Text = AnnouncementContent.NotesContent;
-        UpdateHistoryMainTitle.Text = AnnouncementContent.UpdateHistoryMainTitle;
-        UpdateHistoryTitle0.Text = AnnouncementContent.UpdateHistoryTitle0;
-        UpdateHistoryContent0.Text = AnnouncementContent.UpdateHistoryContent0;
+    private void CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)
+    {
+        if (e.IsSuccess)
+        {
+            string? markdownText;
+            try
+            {
+                // 通过api获取json，解析，获取body节点内容
+
+                //markdownText = "body节点内容";
+                markdownText = "## 公告";
+                markdownText = markdownText.Replace("\r\n", "\n");
+            }
+            catch (Exception ex)
+            {
+                Utility.CustomDebugWriteLine("失败：" + ex.ToString());
+                markdownText = "# 网络连接出错，无法获取更新内容";
+            }
+            webView.CoreWebView2.NavigateToString(Utility.MarkdownToHTML(markdownText));
+        }
+        else
+        {
+            Utility.CustomDebugWriteLine($"WebView2初始化失败: {e.InitializationException.Message}");
+        }
     }
 
     private void CheckBoxOnClick(object sender, RoutedEventArgs e)

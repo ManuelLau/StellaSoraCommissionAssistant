@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using StellaSoraCommissionAssistant.Models;
+﻿using StellaSoraCommissionAssistant.Models;
 using StellaSoraCommissionAssistant.Utilities;
 using StellaSoraCommissionAssistant.ViewModels;
 using System.Diagnostics;
-using System.IO;
-using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,20 +9,15 @@ using System.Windows.Input;
 
 namespace StellaSoraCommissionAssistant.Views;
 
-public partial class SettingsView
+public partial class AppSettingsView
 {
     private readonly SettingsViewModel _viewModel;
 
-    public SettingsView()
+    public AppSettingsView()
     {
         InitializeComponent();
         _viewModel = new SettingsViewModel();
         DataContext = _viewModel;
-    }
-
-    private void SettingsComboBoxSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        SettingsViewModel.UpdateConfigJsonFile();
     }
 
     private void SettingsCheckBoxClick(object sender, RoutedEventArgs e)

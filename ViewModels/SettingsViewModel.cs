@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StellaSoraCommissionAssistant.Models;
-using StellaSoraCommissionAssistant.Utilities;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using StellaSoraCommissionAssistant.Models;
+using StellaSoraCommissionAssistant.Utilities;
 using System.IO;
 
 namespace StellaSoraCommissionAssistant.ViewModels;
@@ -18,56 +18,25 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     public ProgramDataModel programData = ProgramDataModel.Instance;
 
+    private enum ETest
+    {
+        客户端_官服 = 1,
+        模拟器_官服 = 2,
+        模拟器_B服 = 3,
+    };
+
     public SettingsViewModel()
     {
         // 初始化设置选项文本
-        ClientTypeSettingOptionsText =
-        [
-            "客户端-官服",
-            "模拟器-官服",
-            "模拟器-B服",
-            //"台服",
-            //"日服"
-        ];
-        CommissionDispatchTypeSettingOptionsText =
-        [
-            "重复上一次",
-            "自定义",
-        ];
-        CommissionDurationSettingOptionsText =
-        [
-            "4",
-            "8",
-            "12",
-            "20",
-        ];
-        CommissionTypeSettingOptionsText =
-        [
-            "资金报酬 高级",
-            "经验积累 高级",
-            "秘闻素材 高级",
-            "资金报酬 中级",
-            "经验积累 中级",
-            "秘闻素材 中级",
-            "旅人升阶素材A 高级",
-            "旅人升阶素材B 高级",
-            "旅人升阶素材C 高级",
-            "旅人升阶素材A 中级",
-            "旅人升阶素材B 中级",
-            "旅人升阶素材C 中级",
-            "秘闻升阶素材A 高级",
-            "秘闻升阶素材B 高级",
-            "秘闻升阶素材C 高级",
-            "秘闻升阶素材A 中级",
-            "秘闻升阶素材B 中级",
-            "秘闻升阶素材C 中级",
-            "节奏游戏委托 高级",
-            "射击游戏委托 高级",
-            "功夫游戏委托 高级",
-            "节奏游戏委托 中级",
-            "射击游戏委托 中级",
-            "功夫游戏委托 中级",
-        ];
+        ClientTypeSettingOptionsText = Utility.GetEnumDescriptions<EClientTypeSettingOptions>();
+        CommissionDispatchTypeSettingOptionsText = Utility.GetEnumDescriptions<ECommissionDispatchTypeSettingOptions>();
+        CommissionDurationSettingOptionsText = [];
+        foreach (var item in Enum.GetValues(typeof(ECommissionDurationSettingOptions)))
+        {
+            CommissionDurationSettingOptionsText.Add(((int)item).ToString());
+        }
+        CommissionTypeSettingOptionsText = Utility.GetEnumDescriptions<ECommissionTypeSettingOptions>();
+
 
         //查找config.json,如果没有则使用默认的规则生成配置文件
         if (File.Exists(Constants.ConfigJsonFilePath))

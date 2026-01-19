@@ -108,8 +108,6 @@ public partial class MainViewModel : ObservableObject
         {
             _helpWindow = new();
             _helpWindow.Closed += (s, args) => _helpWindow = null;
-            _helpWindow.Left = Application.Current.MainWindow.Left + 10;
-            _helpWindow.Top = Application.Current.MainWindow.Top + 10;
             _helpWindow.Show();
         }
         else
@@ -128,6 +126,8 @@ public partial class MainViewModel : ObservableObject
     }
     public void AppStart()
     {
+        Version? version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        Utility.CustomDebugWriteLine($"启动程序 - Version:{version}");
         // 读取存储的任务列表
         if (File.Exists(Constants.CacheFilePath))
         {

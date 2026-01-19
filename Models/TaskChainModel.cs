@@ -35,7 +35,6 @@ public partial class TaskChainModel : ObservableObject
     [JsonIgnore]
     public string FailedLogMessage { get => $"{Name}失败！"; }
 
-    public ETaskChainType TaskChainType { get; set; }
     public bool ShowInWaitingTaskChainList { get; set; }  //是否在任务列表里显示出来
     public bool PrintStartLog { get; set; }  //是否需要在执行成功时打Log到主界面
     public bool PrintSuccessLog { get; set; }
@@ -46,7 +45,6 @@ public partial class TaskChainModel : ObservableObject
     public TaskChainModel(
         string name,
         DateTime executeDateTime,
-        ETaskChainType taskChainType,
         bool showInWaitingTaskChainList,
         bool printStartLog,
         bool printSuccessLog,
@@ -55,7 +53,6 @@ public partial class TaskChainModel : ObservableObject
         Name = name;
         ExecuteDateTime = executeDateTime;
         Status = ETaskChainStatus.Waiting;
-        TaskChainType = taskChainType;
         ShowInWaitingTaskChainList = showInWaitingTaskChainList;
         PrintStartLog = printStartLog;
         PrintSuccessLog = printSuccessLog;

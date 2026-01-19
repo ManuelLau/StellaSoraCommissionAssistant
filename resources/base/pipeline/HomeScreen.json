@@ -82,7 +82,8 @@
 			"type": "TemplateMatch",
 			"param": {
 				"template": ["UpdatePopup.png"],
-				"roi": [370, 220, 554, 236]
+				"roi": [370, 220, 554, 236],
+				"threshold": 0.9
 			}
 		},
 		"next": "ClickConfirmButton"
@@ -92,7 +93,8 @@
 			"type": "TemplateMatch",
 			"param": {
 				"template": ["MaintenancePopup.png"],
-				"roi": [370, 220, 554, 236]
+				"roi": [370, 220, 554, 236],
+				"threshold": 0.9
 			}
 		},
 		"next": "HomeScreen@MaintenanceDelayTaskChain"
@@ -158,9 +160,10 @@
         "recognition": {
 			"type": "TemplateMatch",
 			"param": {
-				"template": ["Close0.png","Close1.png","Close2.png","CloseGreenMask.png"]
-			},
-    		"green_mask": true
+				"template": ["Close0.png","Close1.png","Close2.png","CloseGreenMask.png"],
+				"threshold": 0.9,
+				"green_mask": true
+			}
 		},
 		"action": {
 			"type": "Click"

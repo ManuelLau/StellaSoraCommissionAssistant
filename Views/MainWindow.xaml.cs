@@ -12,7 +12,6 @@ public partial class MainWindow
         DataContext = MainViewModel.Instance;
         MainViewModel.Instance.AppStart();
         Closing += MainViewModel.Instance.AppClosing;
-        Utility.CustomDebugWriteLine("启动程序");
 #if DEBUG
         CheckVersionIsSame();
 #endif
@@ -45,7 +44,7 @@ public partial class MainWindow
         }
         else
         {
-            Version myConstantVersion = new(Utilities.Constants.AppVersion + ".0");
+            Version myConstantVersion = new(Constants.AppVersion + ".0");
             if (version.Major == myConstantVersion.Major && version.Minor == myConstantVersion.Minor && version.Build == myConstantVersion.Build
                 == false)
             {

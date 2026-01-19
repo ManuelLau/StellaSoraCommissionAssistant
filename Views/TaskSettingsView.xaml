@@ -1,0 +1,102 @@
+﻿<UserControl x:Class="StellaSoraCommissionAssistant.Views.TaskSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+             xmlns:viewmodels="clr-namespace:StellaSoraCommissionAssistant.ViewModels"
+             xmlns:utilities="clr-namespace:StellaSoraCommissionAssistant.Utilities"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewmodels:SettingsViewModel}"
+             d:DesignHeight="600" d:DesignWidth="700">
+
+    <Grid Margin="10 10 10 10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <hc:ScrollViewer Grid.Column="0" HorizontalAlignment="Stretch"
+            HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True"
+            hc:ScrollViewerAttach.AutoHide="False">
+            <StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="客户端类型" Style="{StaticResource SettingTextBlockStyle}"/>
+                    <hc:ComboBox ItemsSource="{Binding ClientTypeSettingOptionsText}"
+                                 SelectedIndex="{Binding ProgramData.SettingsData.ClientTypeSettingIndex}"
+                                 SelectionChanged="SettingsComboBoxSelectionChanged"
+                                 Style="{StaticResource SettingComboBoxStyle}"
+                                 PreviewMouseWheel="ComboBox_PreviewMouseWheel"
+                                 IsEnabled="False">
+                    </hc:ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="下次委托任务派遣" Style="{StaticResource SettingTextBlockStyle}"/>
+                    <hc:ComboBox ItemsSource="{Binding CommissionDispatchTypeSettingOptionsText}"
+                                 SelectedIndex="{Binding ProgramData.SettingsData.CommissionDispatchTypeSettingIndex}"
+                                 SelectionChanged="SettingsComboBoxSelectionChanged"
+                                 Style="{StaticResource SettingComboBoxStyle}"
+                                 PreviewMouseWheel="ComboBox_PreviewMouseWheel">
+                    </hc:ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="委托时长" Style="{StaticResource SettingTextBlockStyle}"/>
+                    <hc:ComboBox ItemsSource="{Binding CommissionDurationSettingOptionsText}"
+                                 SelectedIndex="{Binding ProgramData.SettingsData.CommissionDurationSettingIndex}"
+                                 SelectionChanged="SettingsComboBoxSelectionChanged"
+                                 Style="{StaticResource SettingComboBoxStyle}"
+                                 PreviewMouseWheel="ComboBox_PreviewMouseWheel"
+                                 IsEnabled="{c:Binding 'ProgramData.SettingsData.CommissionDispatchTypeSettingIndex == 1 and !ProgramData.IsCurrentTaskExecuting'}">
+                    </hc:ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="委托任务1" Style="{StaticResource SettingTextBlockStyle}"/>
+                    <hc:ComboBox ItemsSource="{Binding CommissionTypeSettingOptionsText}"
+                                 SelectedIndex="{Binding ProgramData.SettingsData.CommissionTaskTypeSettingIndexs[0]}"
+                                 SelectionChanged="SettingsComboBoxSelectionChanged"
+                                 Style="{StaticResource SettingComboBoxStyle}"
+                                 PreviewMouseWheel="ComboBox_PreviewMouseWheel"
+                                 IsEnabled="{c:Binding 'ProgramData.SettingsData.CommissionDispatchTypeSettingIndex == 1 and !ProgramData.IsCurrentTaskExecuting'}">
+                    </hc:ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="委托任务2" Style="{StaticResource SettingTextBlockStyle}"/>
+                    <hc:ComboBox ItemsSource="{Binding CommissionTypeSettingOptionsText}"
+                                 SelectedIndex="{Binding ProgramData.SettingsData.CommissionTaskTypeSettingIndexs[1]}"
+                                 SelectionChanged="SettingsComboBoxSelectionChanged"
+                                 Style="{StaticResource SettingComboBoxStyle}"
+                                 PreviewMouseWheel="ComboBox_PreviewMouseWheel"
+                                 IsEnabled="{c:Binding 'ProgramData.SettingsData.CommissionDispatchTypeSettingIndex == 1 and !ProgramData.IsCurrentTaskExecuting'}">
+                    </hc:ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="委托任务3" Style="{StaticResource SettingTextBlockStyle}"/>
+                    <hc:ComboBox ItemsSource="{Binding CommissionTypeSettingOptionsText}"
+                                 SelectedIndex="{Binding ProgramData.SettingsData.CommissionTaskTypeSettingIndexs[2]}"
+                                 SelectionChanged="SettingsComboBoxSelectionChanged"
+                                 Style="{StaticResource SettingComboBoxStyle}"
+                                 PreviewMouseWheel="ComboBox_PreviewMouseWheel"
+                                 IsEnabled="{c:Binding 'ProgramData.SettingsData.CommissionDispatchTypeSettingIndex == 1 and !ProgramData.IsCurrentTaskExecuting'}">
+                    </hc:ComboBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <TextBlock Text="委托任务4" Style="{StaticResource SettingTextBlockStyle}"/>
+                    <hc:ComboBox ItemsSource="{Binding CommissionTypeSettingOptionsText}"
+                                 SelectedIndex="{Binding ProgramData.SettingsData.CommissionTaskTypeSettingIndexs[3]}"
+                                 SelectionChanged="SettingsComboBoxSelectionChanged"
+                                 Style="{StaticResource SettingComboBoxStyle}"
+                                 PreviewMouseWheel="ComboBox_PreviewMouseWheel"
+                                 IsEnabled="{c:Binding 'ProgramData.SettingsData.CommissionDispatchTypeSettingIndex == 1 and !ProgramData.IsCurrentTaskExecuting'}">
+                    </hc:ComboBox>
+                </StackPanel>
+                <CheckBox Content="当日结束前自动领取好友体力" Margin="0 10 0 10" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          IsChecked="{Binding ProgramData.SettingsData.IsAcquiceFriendEnergy}"
+                          Click="SettingsCheckBoxClick" IsEnabled="{c:Binding !ProgramData.IsCurrentTaskExecuting}"/>
+                <CheckBox Content="完成任务后退出游戏" Margin="0 10 0 10" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          IsChecked="{Binding ProgramData.SettingsData.IsCloseGameAfterFinishingTask}"
+                          Click="SettingsCheckBoxClick" IsEnabled="{c:Binding !ProgramData.IsCurrentTaskExecuting}"/>
+            </StackPanel>
+        </hc:ScrollViewer>
+    </Grid>
+</UserControl>

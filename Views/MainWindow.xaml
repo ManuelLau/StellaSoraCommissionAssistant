@@ -118,9 +118,14 @@
                     </Grid>
                 </TabItem>
 
-                <TabItem Header="设置" IsSelected="False">
+                <TabItem Header="任务设置" IsSelected="False">
                     <Border>
-                        <views:SettingsView/>
+                        <views:TaskSettingsView/>
+                    </Border>
+                </TabItem>
+                <TabItem Header="软件设置" IsSelected="False">
+                    <Border>
+                        <views:AppSettingsView/>
                     </Border>
                 </TabItem>
             </TabControl>
