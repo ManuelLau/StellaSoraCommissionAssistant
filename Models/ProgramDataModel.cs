@@ -18,9 +18,7 @@ public partial class ProgramDataModel : ObservableObject
     [ObservableProperty]
     public bool isCurrentTaskExecuting;
     [ObservableProperty]
-    public string updateInfo = string.Empty;
-    [ObservableProperty]
-    public EDownloadSource downloadSource;
+    public string updateTaskInfo = string.Empty;  // 更新任务信息，用于显示当前状态或结果
     [ObservableProperty]
     public bool isCheckingNewVersion;
     [ObservableProperty]
@@ -34,6 +32,10 @@ public partial class ProgramDataModel : ObservableObject
     [ObservableProperty]
     public string downloadedSizeInfo = string.Empty;
     [ObservableProperty]
+    public string updateInfoTitle = string.Empty;
+    [ObservableProperty]
+    public string updateInfoContent = string.Empty;
+    [ObservableProperty]
     public string resourcesVersion = "0.0.0.0";
     public SettingsDataModel SettingsData { get; set; }
 
@@ -41,7 +43,6 @@ public partial class ProgramDataModel : ObservableObject
     {
         IsAfkTaskRunning = false;
         IsCurrentTaskExecuting = false;
-        DownloadSource = EDownloadSource.Gitee;
         IsCheckingNewVersion = false;
         HasNewVersion = false;
         IsDownloadingFiles = false;

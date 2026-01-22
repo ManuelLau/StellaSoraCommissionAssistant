@@ -56,13 +56,11 @@
                             <CheckBox Content="启动软件时自动检查更新" Margin="16 4 0 6"
                                       IsChecked="{Binding ProgramData.SettingsData.IsAutoCheckAppUpdate}"
                                       Click="SettingsCheckBoxClick"/>
-                            <CheckBox Content="自动检查资源文件更新" Margin="16 6 0 4"
-                                      IsChecked="{Binding ProgramData.SettingsData.IsAutoUpdateResources}"
-                                      Click="SettingsCheckBoxClick"/>
                         </StackPanel>
                     </StackPanel>
 
                     <Button Grid.Row="4" Content="检查更新" Width="80" Height="36" Margin="0 0 0 0"
+                            IsEnabled="{c:Binding !ProgramData.IsCheckingNewVersion}"
                             Command="{Binding OpenUpdateWindowCommand}"/>
                 </Grid>
 
@@ -76,10 +74,8 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 10">
-                        <Button Content="使用说明" Width="80" Height="36" Margin="0 0 10 0"
+                        <Button Content="使用说明" Width="80" Height="36" Margin="0 0 0 0"
                                 Command="{Binding OpenHelpWindowCommand}"/>
-                        <Button Content="查看公告" Width="80" Height="36" Margin="10 0 0 0"
-                                Command="{Binding OpenAnnouncementWindowCommand}"/>
                     </StackPanel>
                     <TextBlock Grid.Row="1" HorizontalAlignment="Center" Text="B站主页" Foreground="Blue" Cursor="Hand"
                                MouseDown="BilibiliLinkMouseDown"/>

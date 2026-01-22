@@ -18,13 +18,6 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     public ProgramDataModel programData = ProgramDataModel.Instance;
 
-    private enum ETest
-    {
-        客户端_官服 = 1,
-        模拟器_官服 = 2,
-        模拟器_B服 = 3,
-    };
-
     public SettingsViewModel()
     {
         // 初始化设置选项文本
@@ -36,7 +29,6 @@ public partial class SettingsViewModel : ObservableObject
             CommissionDurationSettingOptionsText.Add(((int)item).ToString());
         }
         CommissionTypeSettingOptionsText = Utility.GetEnumDescriptions<ECommissionTypeSettingOptions>();
-
 
         //查找config.json,如果没有则使用默认的规则生成配置文件
         if (File.Exists(Constants.ConfigJsonFilePath))
@@ -92,12 +84,6 @@ public partial class SettingsViewModel : ObservableObject
     public static void OpenUpdateWindow()
     {
         MainViewModel.Instance.OpenUpdateWindow();
-    }
-
-    [RelayCommand]
-    public static void OpenAnnouncementWindow()
-    {
-        MainViewModel.Instance.OpenAnnouncementWindow();
     }
 
     [RelayCommand]

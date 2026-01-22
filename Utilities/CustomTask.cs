@@ -124,6 +124,17 @@ public static class CustomTask
         }
     }
 
+    public class CustomLogFriendEnergy : IMaaCustomAction
+    {
+        public string Name { get; set; } = nameof(CustomLogFriendEnergy);
+        public bool Run(in IMaaContext context, in RunArgs args, in RunResults results)
+        {
+            string result = GetFilteredNodeContent(args, 0, "text");
+            Utility.PrintLog("好友体力已领取" + result);
+            return true;
+        }
+    }
+
     public class CustomMaintenanceDelayTaskChain : IMaaCustomAction
     {
         public string Name { get; set; } = nameof(CustomMaintenanceDelayTaskChain);
@@ -146,16 +157,16 @@ public static class CustomTask
         }
     }
 
-    //public class CustomClientUpdateStopTask : IMaaCustomAction
-    //{
-    //    public string Name { get; set; } = nameof(CustomClientUpdateStopTask);
-    //    public bool Run(in IMaaContext context, in RunArgs args, in RunResults results)
-    //    {
-    //        Utility.PrintError("游戏客户端需要更新，任务即将停止。请手动更新后再启动任务");
-    //        TaskManager.Instance.Stop(true);
-    //        return true;
-    //    }
-    //}
+    public class CustomAppendRestartClientTask : IMaaCustomAction
+    {
+        public string Name { get; set; } = nameof(CustomAppendRestartClientTask);
+        public bool Run(in IMaaContext context, in RunArgs args, in RunResults results)
+        {
+            Utility.PrintLog("更新完成，即将自动重启客户端");
+            TaskManager.Instance.AppendRestartClientTask();
+            return true;
+        }
+    }
 
     // 获取filtered节点第index个元素的指定字段内容
     private static string GetFilteredNodeContent(RunArgs args, int index, string nodeName)
@@ -224,4 +235,15 @@ public static class CustomTask
             return 0;
         }
     }
+
+    //public class CustomClientUpdateStopTask : IMaaCustomAction
+    //{
+    //    public string Name { get; set; } = nameof(CustomClientUpdateStopTask);
+    //    public bool Run(in IMaaContext context, in RunArgs args, in RunResults results)
+    //    {
+    //        Utility.PrintError("游戏客户端需要更新，任务即将停止。请手动更新后再启动任务");
+    //        TaskManager.Instance.Stop(true);
+    //        return true;
+    //    }
+    //}
 }

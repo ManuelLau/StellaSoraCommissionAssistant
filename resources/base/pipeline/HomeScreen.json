@@ -1,15 +1,59 @@
 {
+	"$__mpe_config_HomeScreen": {
+		"$__mpe_code": {
+			"prefix": "",
+			"savedViewport": {
+				"x": 395,
+				"y": -554,
+				"zoom": 0.75
+			},
+			"filename": "HomeScreen",
+			"version": "v0.16.0"
+		}
+	},
 	"HomeScreen": {
-		"next": [
-            "HomeScreen@RecogniseMenuButton",
-            "[JumpBack]HomeScreen@ClickHomeButton",
-            "[JumpBack]HomeScreen@ClickToEnterGame",
-            "[JumpBack]ObtainReward",
-            "[JumpBack]HomeScreen@WaitLoading",
-            "[JumpBack]HomeScreen@UpdatePopup",
-            "HomeScreen@MaintenancePopup",
-            "[JumpBack]HomeScreen@ClosePopup"
-        ]
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": -366,
+				"y": 999
+			}
+		},
+		"next": ["HomeScreen@RecogniseMenuButton", {
+			"name": "ClickHomeButton",
+			"jump_back": true
+		},
+		{
+			"name": "HomeScreen@ClickToEnterGame",
+			"jump_back": true
+		},
+		{
+			"name": "ObtainReward",
+			"jump_back": true
+		},
+		{
+			"name": "HomeScreen@WaitLoading",
+			"jump_back": true
+		},
+		{
+			"name": "HomeScreen@UpdatePopup",
+			"jump_back": true
+		},
+		"HomeScreen@MaintenancePopup", {
+			"name": "HomeScreen@ServerNoResponse",
+			"jump_back": true
+		},
+		"HomeScreen@UpdateFinished", {
+			"name": "HomeScreen@ClosePopup",
+			"jump_back": true
+		}]
 	},
 	"HomeScreen@RecogniseMenuButton": {
 		"recognition": {
@@ -20,12 +64,22 @@
 				"threshold": 0.9
 			}
 		},
-        "post_delay": 1000,
-        "next": "HomeScreen@RecogniseMenuButtonAgain",
-        "timeout": 2000,
-        "on_error": "HomeScreen"
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"post_delay": 1000,
+		"timeout": 2000,
+		"$__mpe_code": {
+			"position": {
+				"x": 300,
+				"y": 0
+			}
+		},
+		"next": ["HomeScreen@RecogniseMenuButtonAgain"],
+		"on_error": ["HomeScreen"]
 	},
-    "HomeScreen@RecogniseMenuButtonAgain": {
+	"HomeScreen@RecogniseMenuButtonAgain": {
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
@@ -35,22 +89,15 @@
 			}
 		},
 		"action": {
-			"type": "StopTask"
-		}
-	},
-	"HomeScreen@ClickHomeButton": {
-		"recognition": {
-			"type": "TemplateMatch",
-			"param": {
-				"template": ["HomeButton0.png", "HomeButton1.png"],
-				"roi": [0,0,500,100],
-				"threshold": 0.9
+			"type": "StopTask",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 582,
+				"y": 28
 			}
-		},
-		"action": {
-			"type": "Click"
-		},
-		"post_delay": 1000
+		}
 	},
 	"HomeScreen@ClickToEnterGame": {
 		"recognition": {
@@ -65,7 +112,13 @@
 				"target": [640, 584, 10, 10]
 			}
 		},
-		"post_delay": 1000
+		"post_delay": 1000,
+		"$__mpe_code": {
+			"position": {
+				"x": 292,
+				"y": 393
+			}
+		}
 	},
 	"HomeScreen@WaitLoading": {
 		"recognition": {
@@ -75,7 +128,17 @@
 				"roi": [0, 500, 0, 220]
 			}
 		},
-		"post_delay": 1000
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"post_delay": 1000,
+		"$__mpe_code": {
+			"position": {
+				"x": 287,
+				"y": 722
+			}
+		}
 	},
 	"HomeScreen@UpdatePopup": {
 		"recognition": {
@@ -86,7 +149,17 @@
 				"threshold": 0.9
 			}
 		},
-		"next": "ClickConfirmButton"
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 285,
+				"y": 969
+			}
+		},
+		"next": ["ClickConfirmButton"]
 	},
 	"HomeScreen@MaintenancePopup": {
 		"recognition": {
@@ -97,7 +170,17 @@
 				"threshold": 0.9
 			}
 		},
-		"next": "HomeScreen@MaintenanceDelayTaskChain"
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 278,
+				"y": 1198
+			}
+		},
+		"next": ["HomeScreen@MaintenanceDelayTaskChain"]
 	},
 	"HomeScreen@MaintenanceDelayTaskChain": {
 		"recognition": {
@@ -105,7 +188,7 @@
 			"param": {
 				"expected": ["-"],
 				"roi": [370, 220, 554, 236],
-				"replace": ["'", ""]
+				"replace": []
 			}
 		},
 		"action": {
@@ -114,7 +197,13 @@
 				"custom_action": "CustomMaintenanceDelayTaskChain"
 			}
 		},
-		"next": "HomeScreen@MaintenanceClickConfirmButton"
+		"$__mpe_code": {
+			"position": {
+				"x": 578,
+				"y": 1185
+			}
+		},
+		"next": ["HomeScreen@MaintenanceClickConfirmButton"]
 	},
 	"HomeScreen@MaintenanceClickConfirmButton": {
 		"recognition": {
@@ -125,9 +214,16 @@
 			}
 		},
 		"action": {
-			"type": "Click"
+			"type": "Click",
+			"param": {}
 		},
-		"next": "HomeScreen@LoginScreenExitGame"
+		"$__mpe_code": {
+			"position": {
+				"x": 852,
+				"y": 1213
+			}
+		},
+		"next": ["HomeScreen@LoginScreenExitGame"]
 	},
 	"HomeScreen@LoginScreenExitGame": {
 		"recognition": {
@@ -139,9 +235,16 @@
 			}
 		},
 		"action": {
-			"type": "Click"
+			"type": "Click",
+			"param": {}
 		},
-		"next": "HomeScreen@ExitGameConfirm"
+		"$__mpe_code": {
+			"position": {
+				"x": 1152,
+				"y": 1207
+			}
+		},
+		"next": ["HomeScreen@ExitGameConfirm"]
 	},
 	"HomeScreen@ExitGameConfirm": {
 		"recognition": {
@@ -152,23 +255,172 @@
 			}
 		},
 		"action": {
-			"type": "Click"
+			"type": "Click",
+			"param": {}
 		},
-		"next": "StopTask"
+		"$__mpe_code": {
+			"position": {
+				"x": 1452,
+				"y": 1223
+			}
+		},
+		"next": ["StopTask"]
 	},
 	"HomeScreen@ClosePopup": {
-        "recognition": {
+		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
-				"template": ["Close0.png","Close1.png","Close2.png","CloseGreenMask.png"],
+				"template": ["Close0.png", "Close1.png", "Close2.png", "Close3.png", "CloseGreenMask.png"],
 				"threshold": 0.9,
 				"green_mask": true
 			}
 		},
 		"action": {
-			"type": "Click"
+			"type": "Click",
+			"param": {}
 		},
 		"post_delay": 1000,
-        "doc": "关闭一切弹窗，包括每日签到界面、氪金礼包弹窗"
+		"doc": "关闭一切弹窗，包括每日签到界面、氪金礼包弹窗",
+		"$__mpe_code": {
+			"position": {
+				"x": 280,
+				"y": 1904
+			}
+		}
+	},
+	"$__mpe_external_ClickHomeButton_HomeScreen": {
+		"$__mpe_code": {
+			"position": {
+				"x": 300,
+				"y": 320
+			}
+		}
+	},
+	"HomeScreen@ServerNoResponse": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["ServerNoResponse.png"],
+				"threshold": 0.9,
+				"roi": [304, 146, 672, 422]
+			}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 277,
+				"y": 1436
+			}
+		},
+		"next": ["HomeScreen@ReturnToLogin"]
+	},
+	"HomeScreen@ReturnToLogin": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["ReturnToLogin.png"],
+				"threshold": 0.9,
+				"roi": [304, 146, 672, 422]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"post_delay": 1000,
+		"$__mpe_code": {
+			"position": {
+				"x": 577,
+				"y": 1448
+			}
+		}
+	},
+	"$__mpe_external_ObtainReward_HomeScreen": {
+		"$__mpe_code": {
+			"position": {
+				"x": 290,
+				"y": 653
+			}
+		}
+	},
+	"$__mpe_external_ClickConfirmButton_HomeScreen": {
+		"$__mpe_code": {
+			"position": {
+				"x": 579,
+				"y": 1026
+			}
+		}
+	},
+	"$__mpe_external_StopTask_HomeScreen": {
+		"$__mpe_code": {
+			"position": {
+				"x": 1722,
+				"y": 1266
+			}
+		}
+	},
+	"HomeScreen@UpdateFinished": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["UpdateFinished.png"],
+				"threshold": 0.9,
+				"roi": [304, 146, 672, 422]
+			}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 278,
+				"y": 1668
+			}
+		},
+		"next": ["HomeScreen@PostRestart"]
+	},
+	"HomeScreen@PostRestart": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "Custom",
+			"param": {
+				"custom_action": "CustomAppendRestartClientTask"
+			}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 571,
+				"y": 1745
+			}
+		},
+		"next": ["HomeScreen@ClickExitButton"]
+	},
+	"HomeScreen@ClickExitButton": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["ExitButton.png"],
+				"threshold": 0.9,
+				"roi": [304, 146, 672, 422]
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"post_delay": 4000,
+		"$__mpe_code": {
+			"position": {
+				"x": 872,
+				"y": 1681
+			}
+		}
 	}
 }

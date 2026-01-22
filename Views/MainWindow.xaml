@@ -62,16 +62,17 @@
                                         <StackPanel Orientation="Horizontal" Height="36"
                                             IsEnabled="{c:Binding 'Status == models:ETaskChainStatus.Waiting'}">
                                             <Ellipse Width="10" Height="10"
-                                                Fill="{Binding Status, Converter={StaticResource TaskStatusToColorConverter}}"/>
+                                                     Fill="{Binding Status, Converter={StaticResource TaskStatusToColorConverter}}"/>
                                             <hc:SimpleText Width="116" Margin="6 0 0 0" TextWrapping="Wrap"
-                                                Text="{Binding Name}" VerticalAlignment="Center"/>
+                                                           Text="{Binding Name}" VerticalAlignment="Center"/>
                                             <TextBox Text="{Binding ExecuteDateTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" Width="140"  Margin="0 0 0 0"
-                                                HorizontalContentAlignment="Center" HorizontalAlignment="Center"
-                                                FontSize="12" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
+                                                     HorizontalContentAlignment="Center" HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                                     PreviewKeyDown="TextBoxPreviewKeyDown" LostFocus="TextBoxLostFocus"/>
                                             <Button Width="28" Height="28" Margin="0 0 0 0"
-                                                Style="{StaticResource ButtonIcon.Small}" Foreground="Red"
-                                                hc:IconElement.Geometry="{StaticResource CloseGeometry}"
-                                                Click="DeleteTaskChain"/>
+                                                    Style="{StaticResource ButtonIcon.Small}" Foreground="Red"
+                                                    hc:IconElement.Geometry="{StaticResource CloseGeometry}"
+                                                    Click="DeleteTaskChain"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -82,34 +83,34 @@
 
                             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Button Content="启动任务" Width="90" Height="40" Margin="10 0 10 0"
-                                    Foreground="{DynamicResource BlackColor}"
-                                    Visibility="{c:Binding !ProgramData.IsAfkTaskRunning}"
-                                    VerticalContentAlignment="Center" Command="{Binding StartTaskButtonCommand}"
-                                    IsEnabled="{c:Binding !ProgramData.IsCheckingNewVersion and !ProgramData.IsDownloadingFiles}"/>
+                                        Foreground="{DynamicResource BlackColor}"
+                                        Visibility="{c:Binding !ProgramData.IsAfkTaskRunning}"
+                                        VerticalContentAlignment="Center" Command="{Binding StartTaskButtonCommand}"
+                                        IsEnabled="{c:Binding !ProgramData.IsCheckingNewVersion and !ProgramData.IsDownloadingFiles}"/>
 
                                 <Button Content="停止任务" Width="90" Height="40" Margin="10 0 10 0"
-                                    Foreground="{DynamicResource BlackColor}"
-                                    Visibility="{c:Binding ProgramData.IsAfkTaskRunning}"
-                                    IsEnabled="{c:Binding !IsStoppingCurrentTask}"
-                                    VerticalContentAlignment="Center" Command="{Binding StopTaskButtonCommand}"/>
+                                        Foreground="{DynamicResource BlackColor}"
+                                        Visibility="{c:Binding ProgramData.IsAfkTaskRunning}"
+                                        IsEnabled="{c:Binding !IsStoppingCurrentTask}"
+                                        VerticalContentAlignment="Center" Command="{Binding StopTaskButtonCommand}"/>
 
                                 <Button Content="{c:Binding 'WaitingTaskList.Count > 0 ? RefreshTaskButtonText : CreateTaskButtonText'}"
-                                    Width="90" Height="40" Margin="10 0 10 0"
-                                    IsEnabled="{c:Binding !ProgramData.IsAfkTaskRunning}"
-                                    VerticalContentAlignment="Center" Command="{Binding CreateButtonCommand}"/>
+                                        Width="90" Height="40" Margin="10 0 10 0"
+                                        IsEnabled="{c:Binding !ProgramData.IsAfkTaskRunning}"
+                                        VerticalContentAlignment="Center" Command="{Binding CreateButtonCommand}"/>
                             </StackPanel>
                         </Grid>
 
                         <hc:ScrollViewer Grid.Column="1" Margin="4 10 8 10" VerticalAlignment="Top" VerticalContentAlignment="Top"
-                            HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True"
-                            hc:ScrollViewerAttach.AutoHide="False" utilities:AutoScrollToBottom.AlwaysScrollToBottom="True">
+                                         HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True"
+                                         hc:ScrollViewerAttach.AutoHide="False" utilities:AutoScrollToBottom.AlwaysScrollToBottom="True">
                             <ItemsControl ItemsSource="{Binding LogDataList}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Margin="10 3 0 3" TextWrapping="Wrap">
                                             <Run Text="{Binding DateTime}" Foreground="Gray"/>
                                             <Run Text="{Binding Content}" 
-                                                Foreground="{Binding IsRed, Converter={StaticResource LogItemColorConverter}}"/>
+                                                 Foreground="{Binding IsRed, Converter={StaticResource LogItemColorConverter}}"/>
                                         </TextBlock>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

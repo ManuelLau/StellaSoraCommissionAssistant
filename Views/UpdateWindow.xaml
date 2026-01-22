@@ -8,15 +8,18 @@
         xmlns:viewmodels="clr-namespace:StellaSoraCommissionAssistant.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:UpdateViewModel}"
-        Title="更新" Height="240" Width="360" ResizeMode="NoResize">
+        Title="更新" Width="480" Height="200" ResizeMode="NoResize" SizeToContent="Height">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="48"/>
             <RowDefinition Height="60"/>
-            <RowDefinition Height="72"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="{Binding ProgramData.UpdateInfo}"
-                   HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+
+        <TextBlock Grid.Row="0" Text="{Binding ProgramData.UpdateTaskInfo}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="下载源" VerticalAlignment="Center"/>
@@ -24,30 +27,36 @@
                          Margin="8 0 0 0" VerticalAlignment="Center" Checked="ApiButtonChecked"
                          IsEnabled="{c:Binding !ProgramData.IsDownloadingFiles}"/>
             <RadioButton Name="ApiOption1" GroupName="MyOptions" Content="github"
-                         Margin="4 0 0 0" VerticalAlignment="Center" Checked="ApiButtonChecked"
+                         Margin="8 0 0 0" VerticalAlignment="Center" Checked="ApiButtonChecked"
                          IsEnabled="{c:Binding !ProgramData.IsDownloadingFiles}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Grid.Row="2" Content="检查更新" Width="80" Height="36"
+            <Button Content="检查更新" Width="80" Height="36"
                     Visibility="{c:Binding !ProgramData.IsDownloadingFiles and !ProgramData.HasNewVersion and !ProgramData.IsReadyForApplyUpdate}"
                     IsEnabled="{c:Binding !ProgramData.IsCheckingNewVersion}"
                     Command="{Binding CheckNewVersionCommand}"/>
-            <Button Grid.Row="2" Content="下载更新" Width="80" Height="36"
+            <Button Content="下载更新" Width="80" Height="36"
                     Visibility="{c:Binding !ProgramData.IsDownloadingFiles and ProgramData.HasNewVersion and !ProgramData.IsReadyForApplyUpdate}"
                     IsEnabled="{c:Binding ProgramData.HasNewVersion}"
                     Command="{Binding DownloadUpdateButtonClickCommand}"/>
-            <Button Grid.Row="2" Content="重启并更新" Width="80" Height="36"
+            <Button Content="重启并更新" Width="80" Height="36"
                     Visibility="{c:Binding !ProgramData.IsDownloadingFiles and ProgramData.IsReadyForApplyUpdate}"
                     Command="{Binding ApplyUpdateButtonClickCommand}"/>
         </StackPanel>
-        
         <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center" Margin="0 8 0 0"
                     Visibility="{c:Binding ProgramData.IsDownloadingFiles}">
-            <ProgressBar Grid.Row="0" Width="240" Height="20" 
-                         Value="{Binding ProgramData.DownloadProgress}"/>
+            <ProgressBar Width="240" Height="20" Value="{Binding ProgramData.DownloadProgress}"/>
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0 12 0 0"
                        Text="{Binding ProgramData.DownloadedSizeInfo}"/>
         </StackPanel>
+
+        <TextBlock Grid.Row="3" Margin="24 0 24 0" FontSize="18" FontWeight="Bold"
+                   Text="{Binding ProgramData.UpdateInfoTitle}" VerticalAlignment="Center"/>
+
+        <hc:ScrollViewer Grid.Row="4" >
+            <TextBlock Grid.Row="4" Margin="24 6 24 10" FontSize="14" TextWrapping="Wrap" LineHeight="20"
+                       Text="{Binding ProgramData.UpdateInfoContent}"/>
+        </hc:ScrollViewer>
     </Grid>
 </Window>

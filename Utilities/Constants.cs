@@ -8,8 +8,8 @@ public static class Constants
     public const string ProjectGiteeUrl = "https://gitee.com/manuel33/StellaSoraCommissionAssistant";
     public const string AppGitHubApiUrl = "https://api.github.com/repos/ManuelLau/StellaSoraCommissionAssistant/releases";
     public const string AppGiteeApiUrl = "https://gitee.com/api/v5/repos/manuel33/StellaSoraCommissionAssistant/releases";
-    public const string ResourcesGitHubApiUrl = "https://api.github.com/repos/ManuelLau/StellaSoraCommissionAssistant/releases";
-    public const string ResourcesGiteeApiUrl = "https://gitee.com/api/v5/repos/manuel33/StellaSoraCommissionAssistant/releases";
+    public const string ResourcesGitHubApiUrl = "https://api.github.com/repos/ManuelLau/StellaSoraCommissionAssistantResources/releases";
+    public const string ResourcesGiteeApiUrl = "https://gitee.com/api/v5/repos/manuel33/StellaSoraCommissionAssistantResources/releases";
     public const string BilibiliLink = "https://space.bilibili.com/3493267989596771";
 
     public static readonly string ConfigJsonDirectory = GetPath(@"config");

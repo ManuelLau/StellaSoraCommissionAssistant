@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using StellaSoraCommissionAssistant.Utilities;
 using StellaSoraCommissionAssistant.ViewModels;
+using System.Windows.Input;
 
 namespace StellaSoraCommissionAssistant.Views;
 
@@ -18,7 +19,7 @@ public partial class MainWindow
     }
 
     // 屏蔽ScrollViewer的滚动事件
-    private void ScrollViewer_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+    private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         ScrollViewer scrollViewer = (ScrollViewer)sender;
         scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta);
@@ -31,6 +32,21 @@ public partial class MainWindow
         {
             if (button.DataContext is Models.TaskChainModel item)
                 MainViewModel.Instance.WaitingTaskList.Remove(item);
+        }
+    }
+
+    private void TextBoxLostFocus(object sender, System.Windows.RoutedEventArgs e)
+    {
+        TaskManager.Instance.SortWaitingTaskChainList();
+    }
+
+    // 输入日期后按下回车自动切换焦点来达到确认输入的效果
+    private void TextBoxPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            e.Handled = true;
         }
     }
 

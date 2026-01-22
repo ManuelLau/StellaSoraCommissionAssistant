@@ -13,7 +13,7 @@ public partial class UpdateWindow
         _viewModel = new UpdateViewModel();
         DataContext = _viewModel;
 
-        if (ProgramDataModel.Instance.DownloadSource == EDownloadSource.Gitee)
+        if (ProgramDataModel.Instance.SettingsData.DownloadSource == EDownloadSource.Gitee)
         {
             ApiOption0.IsChecked = true;
             ApiOption1.IsChecked = false;
@@ -23,17 +23,22 @@ public partial class UpdateWindow
             ApiOption0.IsChecked = false;
             ApiOption1.IsChecked = true;
         }
+        if (!ProgramDataModel.Instance.IsCheckingNewVersion & !ProgramDataModel.Instance.IsDownloadingFiles & !ProgramDataModel.Instance.IsReadyForApplyUpdate)
+        {
+            ProgramDataModel.Instance.UpdateInfoTitle = string.Empty;
+            ProgramDataModel.Instance.UpdateInfoContent = string.Empty;
+        }
     }
 
     private void ApiButtonChecked(object sender, System.Windows.RoutedEventArgs e)
     {
         if (ApiOption0.IsChecked == true)
         {
-            ProgramDataModel.Instance.DownloadSource = EDownloadSource.Gitee;
+            ProgramDataModel.Instance.SettingsData.DownloadSource = EDownloadSource.Gitee;
         }
         else if (ApiOption1.IsChecked == true)
         {
-            ProgramDataModel.Instance.DownloadSource = EDownloadSource.GitHub;
+            ProgramDataModel.Instance.SettingsData.DownloadSource = EDownloadSource.GitHub;
         }
     }
 }

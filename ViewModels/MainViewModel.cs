@@ -32,7 +32,6 @@ public partial class MainViewModel : ObservableObject
     public string refreshTaskButtonText;
 
     private UpdateWindow? _updateWindow;
-    private AnnouncementWindow? _announcementWindow;
     private HelpWindow? _helpWindow;
 
     public MainViewModel()
@@ -73,8 +72,8 @@ public partial class MainViewModel : ObservableObject
         {
             _updateWindow = new();
             _updateWindow.Closed += (s, args) => _updateWindow = null;
-            _updateWindow.Left = Application.Current.MainWindow.Left + 190;
-            _updateWindow.Top = Application.Current.MainWindow.Top + 160;
+            _updateWindow.Left = Application.Current.MainWindow.Left + 110;
+            _updateWindow.Top = Application.Current.MainWindow.Top + 100;
             _updateWindow.Show();
         }
         else
@@ -84,26 +83,8 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    public void OpenAnnouncementWindow()
-    {
-        if (_announcementWindow == null || !_announcementWindow.IsVisible)
-        {
-            _announcementWindow = new();
-            _announcementWindow.Closed += (s, args) => _announcementWindow = null;
-            _announcementWindow.Left = Application.Current.MainWindow.Left + 50;
-            _announcementWindow.Top = Application.Current.MainWindow.Top + 30;
-            _announcementWindow.Show();
-        }
-        else
-        {
-            _announcementWindow.Activate();
-            _announcementWindow.WindowState = WindowState.Normal;
-        }
-    }
-
     public void OpenHelpWindow()
     {
-        Utility.CustomDebugWriteLine("OpenHelpWindow()");
         if (_helpWindow == null || !_helpWindow.IsVisible)
         {
             _helpWindow = new();
@@ -146,16 +127,8 @@ public partial class MainViewModel : ObservableObject
             Task.Run(async () =>
             {
                 await Task.Delay(1000); // 延迟1秒
+                Utility.PrintLog("正在检查更新...");
                 UpdateTool.CheckBothNewVersion(true, out _, out _);
-            });
-        }
-        else if (ProgramData.SettingsData.IsAutoUpdateResources)
-        {
-            // 默认自动检查资源文件更新
-            Task.Run(async () =>
-            {
-                await Task.Delay(1000); // 延迟1秒
-                UpdateTool.CheckNewVersion(false, true, out _, out _, true);
             });
         }
     }

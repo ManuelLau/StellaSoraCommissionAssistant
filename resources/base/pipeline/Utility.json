@@ -3,12 +3,33 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": -314,
-				"y": -473,
-				"zoom": 1.59
+				"x": 596,
+				"y": -73,
+				"zoom": 1.26
 			},
 			"filename": "Utility",
-			"version": "v0.15.2"
+			"version": "v0.16.0"
+		}
+	},
+	"ClickHomeButton": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["HomeButton0.png", "HomeButton1.png"],
+				"roi": [0, 0, 500, 200],
+				"threshold": 0.9
+			}
+		},
+		"action": {
+			"type": "Click",
+			"param": {}
+		},
+		"post_delay": 1000,
+		"$__mpe_code": {
+			"position": {
+				"x": 29,
+				"y": 341
+			}
 		}
 	},
 	"ObtainReward": {
@@ -30,8 +51,8 @@
 		"doc": "关闭一切获得奖励的界面，包括月卡奖励等",
 		"$__mpe_code": {
 			"position": {
-				"x": 349,
-				"y": 485
+				"x": 298,
+				"y": 317
 			}
 		}
 	},
@@ -40,7 +61,7 @@
 			"type": "TemplateMatch",
 			"param": {
 				"template": ["ConfirmButton.png"],
-				"roi": [304, 146, 672, 420]
+				"roi": [304, 146, 672, 422]
 			}
 		},
 		"action": {
@@ -49,8 +70,8 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 604,
-				"y": 486
+				"x": -238,
+				"y": 461
 			}
 		}
 	},
@@ -65,8 +86,8 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 853,
-				"y": 496
+				"x": -241,
+				"y": 330
 			}
 		}
 	}

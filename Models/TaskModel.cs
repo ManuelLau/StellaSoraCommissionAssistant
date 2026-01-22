@@ -7,7 +7,7 @@ public enum ETaskType
     HomeScreen,
     CommissionEnter,
     CommissionCheckState,
-    FriendsEnergy,
+    AcquireFriendsEnergy,
     RestartGame,
 }
 

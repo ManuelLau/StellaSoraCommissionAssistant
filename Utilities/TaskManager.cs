@@ -1,4 +1,5 @@
-﻿using MaaFramework.Binding;
+﻿using HandyControl.Tools.Extension;
+using MaaFramework.Binding;
 using StellaSoraCommissionAssistant.Models;
 using StellaSoraCommissionAssistant.ViewModels;
 using System.Collections.ObjectModel;
@@ -24,7 +25,7 @@ public class TaskManager
     //等待队列，用于主界面显示的任务链列表，包含执行中的、待机的任务
     private readonly ObservableCollection<TaskChainModel> _waitingTaskChainList = MainViewModel.Instance.WaitingTaskList;
     //执行队列，正在执行或即将要执行的任务链列表，执行前会进行客户端连接的流程，执行后进行返回主界面
-    private readonly List<TaskChainModel> _currentTaskChainList = [];
+    private readonly List<TaskChainModel> _executingTaskChainList = [];
     private readonly SettingsDataModel _settingsData = ProgramDataModel.Instance.SettingsData;
     private CancellationTokenSource _cancellationTokenSource;
     private readonly List<DateTime> _commissionCompleteDateTime = [];
@@ -96,23 +97,18 @@ public class TaskManager
     public void CreateTaskChain()
     {
         Queue<TaskModel> tempQueue = new();
-        tempQueue.Enqueue(new("进入主界面", "HomeScreen", string.Empty, ETaskType.HomeScreen));
         tempQueue.Enqueue(new("进入委托界面", "CommissionEnter", string.Empty, ETaskType.CommissionEnter));
         tempQueue.Enqueue(new("识别委托状态", "CommissionCheckState", string.Empty, ETaskType.CommissionCheckState));
         AddToWaitingTaskChainList(new("委托派遣", DateTime.Now, true, true, false, tempQueue));
 
-        if (_settingsData.IsAcquiceFriendEnergy)
+        if (_settingsData.IsAcquireFriendEnergy)
         {
-            tempQueue = new();
-            tempQueue.Enqueue(new("进入主界面", "HomeScreen", string.Empty, ETaskType.HomeScreen));
-            tempQueue.Enqueue(new("领取好友体力", "FriendsEnergy", string.Empty, ETaskType.FriendsEnergy));
-            AddToWaitingTaskChainList(new("领取好友体力", DateTime.Now, true, true, true, tempQueue));
+            AddAcquireFriendEnergyTaskChain();
         }
 
-        //tempQueue = new();
-        //tempQueue.Enqueue(new("Commission@RecogniseDispatchAgain", "Commission@RecogniseDispatchAgain", string.Empty, ETaskType.Normal));
-        //AddToWaitingTaskChainList(new("Test", DateTime.Now, ETaskChainType.System, true, true, string.Empty, tempQueue));
-
+        //tempQueue = new([new("Test", "HomeScreen@ClickExitButton", string.Empty, ETaskType.Normal)]);
+        //AddToWaitingTaskChainList(new("Test", DateTime.Now, true, true, true, tempQueue));
+        SortWaitingTaskChainList();
     }
 
     // 初始化MaaTasker，自动连接客户端和Maa资源
@@ -163,7 +159,9 @@ public class TaskManager
             _maaTasker.Resource.Register(new CustomRecogniseLastTaskDuration());
             _maaTasker.Resource.Register(new CustomCreateCommissionTaskChain());
             _maaTasker.Resource.Register(new CustomDispatchFailed());
+            _maaTasker.Resource.Register(new CustomLogFriendEnergy());
             _maaTasker.Resource.Register(new CustomMaintenanceDelayTaskChain());
+            _maaTasker.Resource.Register(new CustomAppendRestartClientTask());
             //_maaTasker.Resource.Register(new CustomClientUpdateStopTask());
         }
         catch (Exception e)
@@ -296,116 +294,29 @@ public class TaskManager
         return resource;
     }
 
-    // 开启挂机任务
-    private async Task StartAfkTask(CancellationToken token)
-    {
-        bool firstTimeExecute = true;
-
-        while (!token.IsCancellationRequested)
-        {
-            // 判断有无已经到达时间的任务
-            foreach (var taskChainItem in _waitingTaskChainList)
-            {
-                if (DateTime.Now >= taskChainItem.ExecuteDateTime)
-                {
-                    Utility.CustomDebugWriteLine($"检测到有任务链可以执行");
-                    ProgramDataModel.Instance.IsCurrentTaskExecuting = true;
-                    firstTimeExecute = false;
-                    CreateCurrentTaskQueue();
-                    await ExecuteCurrentTask(token);
-                    Utility.CustomDebugWriteLine($"已入列的任务链执行完成或任务停止");
-                    ProgramDataModel.Instance.IsCurrentTaskExecuting = false;
-                    break;
-                }
-            }
-            if (firstTimeExecute)
-            {
-                Utility.PrintLog("暂无可执行任务，小助手待机中");
-                firstTimeExecute = false;
-            }
-            try
-            {
-                await Task.Delay(1000, token); // 每秒检查一次
-            }
-            catch (TaskCanceledException)
-            {
-
-            }
-        }
-        StopCurrentTask();
-    }
-
     // 把已经到达时间的任务入列。同时在头部添加一个启动客户端的任务链，在尾部添加一个返回主界面的任务链。
     private void CreateCurrentTaskQueue()
     {
-        // 如果第一个是重启游戏任务，那么就不用再添加启动游戏任务了
-        if (_waitingTaskChainList[0].TaskQueue.Peek().Type == ETaskType.RestartGame)
+        Queue<TaskModel> tempQueue0 = new();
+        tempQueue0.Enqueue(new("启动游戏", "HomeScreen", string.Empty, ETaskType.HomeScreen));
+        _executingTaskChainList.Add(new("启动游戏", DateTime.Now, false, true, true, tempQueue0));
+        foreach (var task in _waitingTaskChainList)
         {
-            // 自动更新资源文件
-            if (ProgramDataModel.Instance.SettingsData.IsAutoUpdateResources)
+            if (DateTime.Now >= task.ExecuteDateTime)
             {
-                /*
-                UpdateTool.CheckNewVersion(false, true, out _, out _, false);
-                // 等待2秒，用于覆盖更新资源文件
-                Task.Delay(2000).Wait();
-                MaaResource? maaResource = LoadMaaSource();
-                if (maaResource == null)
-                {
-                    Utility.CustomDebugWriteLine("更新资源文件后，重新加载失败！");
-                }
-                else
-                {
-                    if (_maaTasker != null && !_maaTasker.IsInvalid)
-                    {
-                        _maaTasker = new()
-                        {
-
-                            Controller = _maaTasker.Controller,
-                            Resource = maaResource,
-                            DisposeOptions = DisposeOptions.All,
-                        };
-                    }
-                    else
-                    {
-                        Utility.CustomDebugWriteLine("_maaTasker is null!");
-                    }
-                }
-                */
-            }
-        }
-        else
-        {
-            Queue<TaskModel> tempQueue0 = new();
-            tempQueue0.Enqueue(new("启动游戏", "HomeScreen", string.Empty, ETaskType.HomeScreen));
-            _currentTaskChainList.Add(new("启动游戏", DateTime.Now, false, true, true, tempQueue0));
-        }
-
-        for (int i = 0; i < _waitingTaskChainList.Count; i++)
-        {
-            if (DateTime.Now >= _waitingTaskChainList[i].ExecuteDateTime)
-            {
-                _waitingTaskChainList[i].Status = ETaskChainStatus.InCurrentQueue;
+                task.Status = ETaskChainStatus.InCurrentQueue;
                 // 读取设置(进入执行中队列时候才会读取)
-                foreach (var e in _waitingTaskChainList[i].TaskQueue)
+                foreach (var e in task.TaskQueue)
                 {
                     e.PipelineOverride = GetOverrideJsonWithReadConfig(e.Type);
                 }
-                if (i == 0)
-                {
-                    // 移除第一个任务链的启动游戏任务
-                    if (_waitingTaskChainList[i].TaskQueue.Peek().Type == ETaskType.HomeScreen)
-                    {
-                        //_waitingTaskChainList[i].TaskQueue.Dequeue();
-                    }
-                }
-                _currentTaskChainList.Add(_waitingTaskChainList[i]);
+                _executingTaskChainList.Add(task);
             }
         }
-
         Queue<TaskModel> tempQueue1 = new();
         tempQueue1.Enqueue(new("返回主界面", "HomeScreen", string.Empty, ETaskType.HomeScreen));
-        _currentTaskChainList.Add(new("返回主界面", DateTime.Now, false, false, false, tempQueue1));
-        foreach (var item in _currentTaskChainList)
+        _executingTaskChainList.Add(new("返回主界面", DateTime.Now, false, false, false, tempQueue1));
+        foreach (var item in _executingTaskChainList)
         {
             Utility.CustomDebugWriteLine($"{item.ExecuteDateTime} - {item.Name}");
         }
@@ -413,16 +324,16 @@ public class TaskManager
 
     private async Task ExecuteCurrentTask(CancellationToken token)
     {
-        // 初始化清空数据
+        // 初始化数据
         _commissionCompleteDateTime.Clear();
         _lastTaskDurationInHours = 0;
-        while (_currentTaskChainList.Count > 0)
+        while (_executingTaskChainList.Count > 0)
         {
             if (token.IsCancellationRequested)
             {
                 return;
             }
-            var currentTaskChain = _currentTaskChainList[0];
+            var currentTaskChain = _executingTaskChainList[0];
             currentTaskChain.Status = ETaskChainStatus.Running;
             if (!await InitMaaTasker(token))
             {
@@ -492,19 +403,32 @@ public class TaskManager
                 }
                 Utility.CustomDebugWriteLine($"[任务链]   - 完成 - {currentTaskChain.Name}");
             }
-            //移除任务链。如果是因为用户手动取消的话就不移除，并将状态设为等待中
+            // 移除任务链。如果是因为用户手动取消的话就不移除，并将状态设为等待中
             if (token.IsCancellationRequested)
             {
                 currentTaskChain.Status = ETaskChainStatus.Waiting;
             }
             else
             {
-                _currentTaskChainList.Remove(currentTaskChain);
+                // 重新添加领取好友体力任务
+                bool ReaddAcquireFriendEnergyTaskChain = false;
+                if (_settingsData.IsAcquireFriendEnergy)
+                {
+                    if (currentTaskChain.TaskQueue.Peek().Type == ETaskType.AcquireFriendsEnergy)
+                    {
+                        ReaddAcquireFriendEnergyTaskChain = true;
+                    }
+                }
+                _executingTaskChainList.Remove(currentTaskChain);
                 if (currentTaskChain.ShowInWaitingTaskChainList)
                 {
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         _waitingTaskChainList.Remove(currentTaskChain);
+                        if (ReaddAcquireFriendEnergyTaskChain)
+                        {
+                            AddAcquireFriendEnergyTaskChain();
+                        }
                     });
                 }
             }
@@ -512,31 +436,53 @@ public class TaskManager
 
         if (_settingsData.IsCloseGameAfterFinishingTask)
         {
-            if (_maaTasker != null)
-            {
-                DesktopWindowInfo? gameWindow = FindWindow();
-                if (gameWindow is null)
-                {
-                    Utility.PrintLog("未找到游戏窗口，无法自动退出客户端");
-                    return;
-                }
-                bool success = PostMessage(gameWindow.Handle, 0x0010, IntPtr.Zero, IntPtr.Zero);
-                if (success)
-                {
-                    Utility.PrintLog("即将自动退出客户端");
-                }
-                else
-                {
-                    Utility.PrintLog("自动退出客户端失败!");
-                }
-            }
+            ExitGameClient();
         }
         Utility.PrintLog("当前任务已完成，小助手待机中");
     }
 
+    // 开启挂机任务
+    private async Task StartAfkTask(CancellationToken token)
+    {
+        bool firstTimeExecute = true;
+
+        while (!token.IsCancellationRequested)
+        {
+            // 判断有无已经到达时间的任务
+            foreach (var taskChainItem in _waitingTaskChainList)
+            {
+                if (DateTime.Now >= taskChainItem.ExecuteDateTime)
+                {
+                    Utility.CustomDebugWriteLine($"检测到有任务链可以执行");
+                    ProgramDataModel.Instance.IsCurrentTaskExecuting = true;
+                    firstTimeExecute = false;
+                    CreateCurrentTaskQueue();
+                    await ExecuteCurrentTask(token);
+                    Utility.CustomDebugWriteLine($"已入列的任务链执行完成或任务停止");
+                    ProgramDataModel.Instance.IsCurrentTaskExecuting = false;
+                    break;
+                }
+            }
+            if (firstTimeExecute)
+            {
+                Utility.PrintLog("暂无可执行任务，小助手待机中");
+                firstTimeExecute = false;
+            }
+            try
+            {
+                await Task.Delay(1000, token); // 每秒检查一次
+            }
+            catch (TaskCanceledException)
+            {
+
+            }
+        }
+        StopCurrentTask();
+    }
+
     private void StopCurrentTask()
     {
-        _currentTaskChainList.Clear();
+        _executingTaskChainList.Clear();
         ProgramDataModel.Instance.IsAfkTaskRunning = false;
         ProgramDataModel.Instance.IsCurrentTaskExecuting = false;
         MainViewModel.Instance.IsStoppingCurrentTask = false;
@@ -553,6 +499,31 @@ public class TaskManager
             {
                 _waitingTaskChainList.Add(item);
             });
+        }
+    }
+
+    public void SortWaitingTaskChainList()
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var sortedList = _waitingTaskChainList.OrderBy(item => item.ExecuteDateTime).ToList();
+            _waitingTaskChainList.Clear();
+            _waitingTaskChainList.AddRange(sortedList);
+        });
+    }
+
+    private void AddAcquireFriendEnergyTaskChain()
+    {
+        if (_settingsData.IsAcquireFriendEnergy)
+        {
+            DateTime dateTime = DateTime.Now.Date + _settingsData.AcquireFriendEnergyTime.ToTimeSpan();
+            if (dateTime < DateTime.Now)
+            {
+                dateTime = dateTime.AddDays(1);
+            }
+            Queue<TaskModel> tempQueue = new();
+            tempQueue.Enqueue(new("领取好友体力", "AcquireFriendsEnergy", string.Empty, ETaskType.AcquireFriendsEnergy));
+            AddToWaitingTaskChainList(new("领取好友体力", dateTime, true, true, true, tempQueue));
         }
     }
 
@@ -605,6 +576,28 @@ public class TaskManager
         }
     }
 
+    private void ExitGameClient()
+    {
+        if (_maaTasker != null)
+        {
+            DesktopWindowInfo? gameWindow = FindWindow();
+            if (gameWindow is null)
+            {
+                Utility.PrintLog("未找到游戏窗口，无法自动退出客户端");
+                return;
+            }
+            bool success = PostMessage(gameWindow.Handle, 0x0010, IntPtr.Zero, IntPtr.Zero);
+            if (success)
+            {
+                Utility.PrintLog("即将自动退出客户端");
+            }
+            else
+            {
+                Utility.PrintLog("自动退出客户端失败!");
+            }
+        }
+    }
+
     public void AddCommissionCompleteTime(DateTime dateTime, bool isCustomDispatch)
     {
         // 两者之间只使用一个，另一个要置0
@@ -651,12 +644,12 @@ public class TaskManager
             return;
         }
         Queue<TaskModel> tempQueue = new();
-        tempQueue.Enqueue(new("进入主界面", "HomeScreen", string.Empty, ETaskType.HomeScreen));
         tempQueue.Enqueue(new("进入委托界面", "CommissionEnter", string.Empty, ETaskType.Normal));
         tempQueue.Enqueue(new("识别委托状态", "CommissionCheckState", string.Empty, ETaskType.Normal));
         AddToWaitingTaskChainList(new("委托派遣", dateTime, true, true, false, tempQueue));
         Utility.PrintLog("下次委托派遣时间：" + dateTime.ToString("MM-dd HH:mm:ss"));
-        // 添加完成后清空数据
+        // 添加完成后重新排序+清空数据
+        SortWaitingTaskChainList();
         _commissionCompleteDateTime.Clear();
         _lastTaskDurationInHours = 0;
     }
@@ -683,12 +676,13 @@ public class TaskManager
                 }
             }
             Utility.CustomDebugWriteLine($"延后任务链{taskChainItem.Name} - 新时间{taskChainItem.ExecuteDateTime}");
+            ExitGameClient();
         }
-        // 重新排序等待队列
-
+        // 重新排序任务列表
+        SortWaitingTaskChainList();
         // 清空当前任务
-        _currentTaskChainList[0].PrintSuccessLog = false;
-        _currentTaskChainList.Clear();
+        _executingTaskChainList[0].PrintSuccessLog = false;
+        _executingTaskChainList.Clear();
         foreach(var e in  _waitingTaskChainList)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -696,5 +690,17 @@ public class TaskManager
                 e.Status = ETaskChainStatus.Waiting;
             });
         }
+    }
+
+    public void AppendRestartClientTask()
+    {
+        if (_executingTaskChainList[0].TaskQueue.Peek().Type != ETaskType.HomeScreen)
+        {
+            Utility.PrintError("当前第一个任务不是HomeScreen!");
+        }
+        _executingTaskChainList[0].PrintSuccessLog = false;
+        Queue<TaskModel> tempQueue = new();
+        tempQueue.Enqueue(new("重启游戏", "HomeScreen", string.Empty, ETaskType.HomeScreen));
+        _executingTaskChainList.Insert(1, new("重启游戏", DateTime.Now, false, false, true, tempQueue));
     }
 }

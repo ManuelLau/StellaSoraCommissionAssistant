@@ -17,7 +17,7 @@ public partial class UpdateViewModel : ObservableObject
     {
         if (!ProgramData.IsCheckingNewVersion && !ProgramData.IsDownloadingFiles && !ProgramData.IsReadyForApplyUpdate)
         {
-            _ = CheckNewVersion();
+            Task.Run(CheckNewVersion);
         }
     }
 

@@ -1,75 +1,87 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using System.Windows;
-using System.Text;
-using System.Diagnostics;
-using System.IO.Compression;
-using System.IO;
-using System.Reflection;
 using SharpCompress.Archives;
 using SharpCompress.Common;
-using StellaSoraCommissionAssistant.ViewModels;
 using StellaSoraCommissionAssistant.Models;
+using StellaSoraCommissionAssistant.ViewModels;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Net.Http;
+using System.Reflection;
+using System.Text;
+using System.Windows;
 
 namespace StellaSoraCommissionAssistant.Utilities;
 
 /* 更新策略：
- * 先检测软件版本，如果有更新则进行全文件更新
- * 如果软件版本已是最新，则检测资源文件版本，如果有更新则只更新资源文件
- * 启动软件时会自动进行一次资源文件更新的检测，如果有更新则提示用户
- * 执行每日凌晨3点/4点重启游戏时会自动检测+更新资源文件
+ * -启动时更新：
+ * 如果勾选了"启动软件时自动检查更新"，则每次启动软件时先检查软件版本更新
+ * 如果软件有新版本则提示用户手动更新软件，且不再检查资源文件更新
+ * 如果软件版本已是最新，则检查资源文件版本更新
+ * 如果资源文件有更新，则提示用户。如果勾选了"自动更新资源文件"，则自动执行更新
+ * -定时自动更新：
+ * 如果勾选了"自动更新资源文件"，每日凌晨4点(服务器时间重置时)自动检测资源文件更新并自动更新资源文件
  * 注：更新资源文件时不包括ocr模型文件
  */
 public static class UpdateTool
 {
-    /// <summary>
-    /// 先检查软件新版本，再检查资源文件新版本
-    /// 如果软件有新版本则不检查资源文件。因为更新软件会同时更新资源文件
-    /// </summary>
-    /// <param name="needPrintLog">是否需要打印Log到主界面</param>
-    /// <returns>是否发现新版本</returns>
-    public static void CheckBothNewVersion(bool needPrintLog, out bool _appCanUpdate, out bool _resourcesCanUpdate)
+    public enum ECheckUpdateType
     {
-        _appCanUpdate = false;
-        _resourcesCanUpdate = false;
-        CheckNewVersion(true, needPrintLog, out bool appIsUpToDate, out bool appCanUpdate, true);
+        App,
+        Resources
+    }
+    /// <summary>
+    /// 检查软件、资源文件更新
+    /// 如果软件有新版本则不检查资源文件。默认更新软件会同时更新资源文件
+    /// </summary>
+    /// <param name="fromMainView">入口是否为主页，是的话则需要打印Log到主界面</param>
+    /// <returns>是否发现新版本</returns>
+    public static void CheckBothNewVersion(bool fromMainView, out bool appCanUpdate, out bool resourcesCanUpdate)
+    {
+        ProgramDataModel.Instance.UpdateInfoTitle = string.Empty;
+        ProgramDataModel.Instance.UpdateInfoContent = string.Empty;
+        CheckNewVersion(ECheckUpdateType.App, fromMainView, out bool appIsUpToDate, out appCanUpdate, out string updateInfoTitle, out string updateInfoContent);
         if (appIsUpToDate)
         {
-            CheckNewVersion(false, needPrintLog, out bool resourcesIsUpToDate, out bool resourcesCanUpdate, true);
-            if (appIsUpToDate && resourcesIsUpToDate)
+            CheckNewVersion(ECheckUpdateType.Resources, fromMainView, out bool resourcesIsUpToDate, out resourcesCanUpdate, out updateInfoTitle, out updateInfoContent);
+            if (resourcesIsUpToDate)
             {
-                ProgramDataModel.Instance.UpdateInfo = "当前已是最新版本";
-                if (needPrintLog)
-                    Utility.PrintLog(ProgramDataModel.Instance.UpdateInfo);
+                ProgramDataModel.Instance.UpdateTaskInfo = "当前已是最新版本";
+                if (fromMainView)
+                    Utility.PrintLog(ProgramDataModel.Instance.UpdateTaskInfo);
             }
-            else if (resourcesCanUpdate)
+            else
             {
-                _resourcesCanUpdate = true;
+                ProgramDataModel.Instance.UpdateInfoTitle = updateInfoTitle;
+                ProgramDataModel.Instance.UpdateInfoContent = updateInfoContent;
             }
         }
         else
         {
-            if (appCanUpdate)
-                _appCanUpdate = true;
+            ProgramDataModel.Instance.UpdateInfoTitle = updateInfoTitle;
+            ProgramDataModel.Instance.UpdateInfoContent = updateInfoContent;
+            resourcesCanUpdate = false;
         }
     }
 
-    /// <param name="checkApp">true为检查软件更新，false为检查资源文件更新</param>
-    public static void CheckNewVersion(bool checkApp, bool needPrintLog, out bool isUpToDate, out bool canUpdate, bool asyncUpdateResources)
+    public static void CheckNewVersion(ECheckUpdateType checkUpdateType, bool fromMainView, 
+        out bool isUpToDate, out bool canUpdate, out string updateInfoTitle, out string updateInfoContent)
     {
         isUpToDate = false;
         canUpdate = false;
+        updateInfoTitle = string.Empty;
+        updateInfoContent = string.Empty;
         // 获取并检查Version是否非空
         Version? localAppVersion = null;
         Version? localResourceVersion = null;
-        if (checkApp)
+        if (checkUpdateType == ECheckUpdateType.App)
         {
             localAppVersion = Assembly.GetExecutingAssembly().GetName().Version;
             if (localAppVersion is null)
             {
-                ProgramDataModel.Instance.UpdateInfo = "获取当前软件版本失败";
-                if (needPrintLog)
-                    Utility.PrintLog(ProgramDataModel.Instance.UpdateInfo);
+                ProgramDataModel.Instance.UpdateTaskInfo = "获取当前软件版本失败";
+                if (fromMainView)
+                    Utility.PrintLog(ProgramDataModel.Instance.UpdateTaskInfo);
                 Utility.CustomDebugWriteLine("获取当前软件版本失败，LocalVersion为空");
                 return;
             }
@@ -79,34 +91,34 @@ public static class UpdateTool
             localResourceVersion = new(ProgramDataModel.Instance.ResourcesVersion);
             if (localResourceVersion is null)
             {
-                ProgramDataModel.Instance.UpdateInfo = "获取当前资源文件版本失败";
-                if (needPrintLog)
-                    Utility.PrintLog(ProgramDataModel.Instance.UpdateInfo);
+                ProgramDataModel.Instance.UpdateTaskInfo = "获取当前资源文件版本失败";
+                if (fromMainView)
+                    Utility.PrintLog(ProgramDataModel.Instance.UpdateTaskInfo);
                 Utility.CustomDebugWriteLine("获取当前资源文件版本失败，LocalResourceVersion为空");
                 return;
             }
         }
         // 获取版本号
         string apiUrl;
-        if (checkApp)
+        if (checkUpdateType == ECheckUpdateType.App)
         {
-            apiUrl = ProgramDataModel.Instance.DownloadSource == EDownloadSource.Gitee ? Constants.AppGiteeApiUrl : Constants.AppGitHubApiUrl;
+            apiUrl = ProgramDataModel.Instance.SettingsData.DownloadSource == EDownloadSource.Gitee ? Constants.AppGiteeApiUrl : Constants.AppGitHubApiUrl;
         }
         else
         {
-            apiUrl = ProgramDataModel.Instance.DownloadSource == EDownloadSource.Gitee ? Constants.ResourcesGiteeApiUrl : Constants.ResourcesGitHubApiUrl;
+            apiUrl = ProgramDataModel.Instance.SettingsData.DownloadSource == EDownloadSource.Gitee ? Constants.ResourcesGiteeApiUrl : Constants.ResourcesGitHubApiUrl;
         }
-        if (!GetLatestVersionAndDownloadUrl(apiUrl, Constants.PlatformTag, out string latestVersionString, out _))
+        if (!GetLatestVersionAndDownloadUrl(apiUrl, Constants.PlatformTag, fromMainView, out string latestVersionString, out _, out updateInfoTitle, out updateInfoContent))
         {
-            if (checkApp)
+            if (checkUpdateType == ECheckUpdateType.App)
             {
-                if (needPrintLog)
+                if (fromMainView)
                     Utility.PrintLog("检查软件新版本时网络请求出错");
                 Utility.CustomDebugWriteLine("检查软件新版本时网络请求出错");
             }
             else
             {
-                if (needPrintLog)
+                if (fromMainView)
                     Utility.PrintLog("检查资源文件新版本时网络请求出错");
                 Utility.CustomDebugWriteLine("检查资源文件新版本时网络请求出错");
             }
@@ -114,7 +126,7 @@ public static class UpdateTool
         }
         // 比较版本号大小
         Version latestVersion = new(RemoveFirstLetterV(latestVersionString));
-        if (checkApp)
+        if (checkUpdateType == ECheckUpdateType.App)
         {
             Utility.CustomDebugWriteLine($"App - LocalVersion:{localAppVersion} | LatestVersion:{latestVersion}");
             if (localAppVersion != null && localAppVersion.CompareTo(latestVersion) >= 0)
@@ -124,8 +136,8 @@ public static class UpdateTool
             else
             {
                 canUpdate = true;
-                ProgramDataModel.Instance.UpdateInfo = $"发现软件新版本{latestVersionString}，是否更新？";
-                if (needPrintLog)
+                ProgramDataModel.Instance.UpdateTaskInfo = $"发现软件新版本{latestVersionString}，是否更新？";
+                if (fromMainView)
                     Utility.PrintLog($"发现软件新版本{latestVersionString}，请前往设置页面手动更新");
                 Utility.CustomDebugWriteLine($"发现软件新版本 {latestVersionString}");
             }
@@ -136,35 +148,14 @@ public static class UpdateTool
             if (localResourceVersion != null && localResourceVersion.CompareTo(latestVersion) >= 0)
             {
                 isUpToDate = true;
-                if (needPrintLog)
-                    Utility.PrintLog("当前资源文件已是最新版本");
             }
             else
             {
                 canUpdate = true;
-                ProgramDataModel.Instance.UpdateInfo = $"发现资源文件新版本{latestVersionString}，是否更新？";
-                if (needPrintLog)
+                ProgramDataModel.Instance.UpdateTaskInfo = $"发现资源文件新版本{latestVersionString}，是否更新？";
+                if (fromMainView)
                 {
-                    // 需要打印Log则表示是在主界面调用，则触发自动更新资源文件
-                    if (ProgramDataModel.Instance.SettingsData.IsAutoUpdateResources)
-                    {
-                        Utility.PrintLog($"发现资源文件新版本{latestVersionString}");
-                        if (asyncUpdateResources)
-                        {
-                            Task.Run(async () =>
-                            {
-                                await UpdateResource(true);
-                            });
-                        }
-                        else
-                        {
-                            UpdateResource(true).GetAwaiter().GetResult();
-                        }
-                    }
-                    else
-                    {
-                        Utility.PrintLog($"发现资源文件新版本{latestVersionString}，请前往设置页面手动更新");
-                    }
+                    Utility.PrintLog($"发现资源文件新版本{latestVersionString}，请前往设置页面手动更新");
                 }
                 else
                 {
@@ -176,21 +167,25 @@ public static class UpdateTool
     }
 
     /// <summary>
-    /// 通过api获取最新的版本号及其下载链接，不论是否为pre-release版本，此方法获取的json体积更小，更节省资源。
-    /// <para>读取tag_name作为版本号，上传Release的时候请注意正确填写tag。</para>
+    /// 通过api获取最新的版本号及其下载链接，不论是否为pre-release版本，此方法获取的json体积更小，更节省资源
+    /// <para>读取tag_name作为版本号，上传Release的时候请注意正确填写tag，格式为"v1.1.1"</para>
     /// <para>读取browser_download_url作为下载链接，请注意上传的文件要为.zip .7z .rar等压缩文件</para>
     /// <para>platformTag字段为文件名中含有的平台标识，根据自己的需求填写</para>
     /// </summary>
     /// <param name="apiUrl">Api链接，不要带/latest后缀</param>
+    /// <param name="fromMainView">执行入口是否为主页。从主页执行，需要跳过url、updateinfo</param>
     /// <returns>获取失败返回false</returns>
-    private static bool GetLatestVersionAndDownloadUrl(string apiUrl, string platformTag, out string latestVersionString, out string downloadUrl)
+    private static bool GetLatestVersionAndDownloadUrl(string apiUrl, string platformTag, bool fromMainView, 
+        out string latestVersionString, out string downloadUrl, out string updateInfoTitle, out string updateInfoContent)
     {
-        ProgramDataModel.Instance.IsCheckingNewVersion = true;
-        ProgramDataModel.Instance.UpdateInfo = "正在检查更新...";
-        Utility.CustomDebugWriteLine($"正在检查更新,apiUrl = {apiUrl}");
-        apiUrl += "/latest"; //获取最新版本，不论是否为pre-release
         latestVersionString = string.Empty;
         downloadUrl = string.Empty;
+        updateInfoTitle = string.Empty;
+        updateInfoContent = string.Empty;
+        ProgramDataModel.Instance.IsCheckingNewVersion = true;
+        ProgramDataModel.Instance.UpdateTaskInfo = "正在检查更新...";
+        Utility.CustomDebugWriteLine($"正在检查更新,apiUrl = {apiUrl}");
+        apiUrl += "/latest"; //获取最新版本，不论是否为pre-release
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
@@ -218,34 +213,48 @@ public static class UpdateTool
                     return false;
                 }
                 latestVersionString = tagNameToken.ToString();
-
-                if (json["assets"] is JArray assetsJsonArray && assetsJsonArray.Count > 0)
+                if (!fromMainView)
                 {
-                    foreach (var assetJsonObject in assetsJsonArray)
+                    // 读取下载链接
+                    if (json["assets"] is JArray assetsJsonArray && assetsJsonArray.Count > 0)
                     {
-                        string? browserDownloadUrl = assetJsonObject["browser_download_url"]?.ToString();
-                        if (!string.IsNullOrEmpty(browserDownloadUrl))
+                        foreach (var assetJsonObject in assetsJsonArray)
                         {
-                            if (browserDownloadUrl.Contains(platformTag))
+                            string? browserDownloadUrl = assetJsonObject["browser_download_url"]?.ToString();
+                            if (!string.IsNullOrEmpty(browserDownloadUrl))
                             {
-                                if (browserDownloadUrl.EndsWith(".zip") || browserDownloadUrl.EndsWith(".7z") || browserDownloadUrl.EndsWith(".rar"))
+                                if (browserDownloadUrl.Contains(platformTag))
                                 {
-                                    downloadUrl = browserDownloadUrl;
-                                    break;
+                                    if (browserDownloadUrl.EndsWith(".zip") || browserDownloadUrl.EndsWith(".7z") || browserDownloadUrl.EndsWith(".rar"))
+                                    {
+                                        downloadUrl = browserDownloadUrl;
+                                        break;
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                ProgramDataModel.Instance.UpdateInfo = "ERR:下载链接中找不到对应的PlatformTag";
-                                Utility.CustomDebugWriteLine("下载链接中找不到对应的PlatformTag");
+                                else
+                                {
+                                    ProgramDataModel.Instance.UpdateTaskInfo = "错误:返回的json中找不到对应的PlatformTag";
+                                    Utility.CustomDebugWriteLine("返回的json中找不到对应的PlatformTag");
+                                }
                             }
                         }
                     }
+                    // 读取更新内容
+                    var body = json["body"];
+                    if (body is null)
+                    {
+                        Utility.CustomDebugWriteLine("获取的body为空");
+                        ProgramDataModel.Instance.IsCheckingNewVersion = false;
+                        return false;
+                    }
+                    string[] strs = body.ToString().Split("\r\n", 2);
+                    updateInfoTitle = strs[0].Replace("## ", "");
+                    updateInfoContent = strs.Length > 1 ? strs[1] : "";
                 }
             }
             else
             {
-                ProgramDataModel.Instance.UpdateInfo = $"检查新版本时网络请求出错-{response.StatusCode}";
+                ProgramDataModel.Instance.UpdateTaskInfo = $"检查新版本时网络请求出错-{response.StatusCode}";
                 Utility.CustomDebugWriteLine($"检查新版本时网络请求出错: {response.StatusCode} - {response.ReasonPhrase}");
                 ProgramDataModel.Instance.IsCheckingNewVersion = false;
                 return false;
@@ -253,7 +262,7 @@ public static class UpdateTool
         }
         catch (Exception e)
         {
-            ProgramDataModel.Instance.UpdateInfo = "检查新版本时网络请求出错";
+            ProgramDataModel.Instance.UpdateTaskInfo = "检查新版本时网络请求出错";
             Utility.CustomDebugWriteLine($"检查新版本时网络请求出错: {e.Message}");
             ProgramDataModel.Instance.IsCheckingNewVersion = false;
             return false;
@@ -278,8 +287,8 @@ public static class UpdateTool
 
     public static async Task<string> UpdateApp()
     {
-        string apiUrl = ProgramDataModel.Instance.DownloadSource == EDownloadSource.Gitee ? Constants.AppGiteeApiUrl : Constants.AppGitHubApiUrl;
-        if (!GetLatestVersionAndDownloadUrl(apiUrl, Constants.PlatformTag, out string latestVersionString, out string downloadUrl))
+        string apiUrl = ProgramDataModel.Instance.SettingsData.DownloadSource == EDownloadSource.Gitee ? Constants.AppGiteeApiUrl : Constants.AppGitHubApiUrl;
+        if (!GetLatestVersionAndDownloadUrl(apiUrl, Constants.PlatformTag, false, out string latestVersionString, out string downloadUrl, out _, out _))
         {
             ProgramDataModel.Instance.HasNewVersion = false;
             Utility.CustomDebugWriteLine("检查软件新版本号出错! - UpdateApp()");
@@ -301,15 +310,15 @@ public static class UpdateTool
         string tempFileName = GetFileNameFromUrl(downloadUrl);
         // 下载+解压文件到temp\
         MainViewModel.Instance.ProgramData.IsDownloadingFiles = true;
-        MainViewModel.Instance.ProgramData.UpdateInfo = $"正在下载{tempFileName}";
+        MainViewModel.Instance.ProgramData.UpdateTaskInfo = $"正在下载{tempFileName}";
         if (!await DownloadAndExtractFile(downloadUrl, tempFileDirectory, tempFileName))
         {
-            MainViewModel.Instance.ProgramData.UpdateInfo = "文件下载失败！";
+            MainViewModel.Instance.ProgramData.UpdateTaskInfo = "文件下载失败！";
             Utility.CustomDebugWriteLine("文件下载失败");
             MainViewModel.Instance.ProgramData.IsDownloadingFiles = false;
             return string.Empty;
         }
-        MainViewModel.Instance.ProgramData.UpdateInfo = $"文件下载完成，是否重启并更新软件";
+        MainViewModel.Instance.ProgramData.UpdateTaskInfo = $"文件下载完成，是否重启并更新软件";
         Utility.CustomDebugWriteLine($"{tempFileName}下载+解压完成");
         MainViewModel.Instance.ProgramData.IsDownloadingFiles = false;
         MainViewModel.Instance.ProgramData.IsReadyForApplyUpdate = true;
@@ -320,8 +329,8 @@ public static class UpdateTool
     // 资源文件更新，下载+解压+覆盖文件
     public static async Task UpdateResource(bool needPrintLog)
     {
-        string apiUrl = ProgramDataModel.Instance.DownloadSource == EDownloadSource.Gitee ? Constants.ResourcesGiteeApiUrl : Constants.ResourcesGitHubApiUrl;
-        if (!GetLatestVersionAndDownloadUrl(apiUrl, Constants.PlatformTag, out string latestVersionString, out string downloadUrl))
+        string apiUrl = ProgramDataModel.Instance.SettingsData.DownloadSource == EDownloadSource.Gitee ? Constants.ResourcesGiteeApiUrl : Constants.ResourcesGitHubApiUrl;
+        if (!GetLatestVersionAndDownloadUrl(apiUrl, Constants.PlatformTag, false, out string latestVersionString, out string downloadUrl, out _, out _))
         {
             ProgramDataModel.Instance.HasNewVersion = false;
             if (needPrintLog)
@@ -347,17 +356,17 @@ public static class UpdateTool
         MainViewModel.Instance.ProgramData.IsDownloadingFiles = true;
         if (needPrintLog)
             Utility.PrintLog($"正在下载并自动更新资源文件{latestVersionString}...");
-        MainViewModel.Instance.ProgramData.UpdateInfo = $"正在下载并自动更新资源文件{latestVersionString}...";
+        MainViewModel.Instance.ProgramData.UpdateTaskInfo = $"正在下载并自动更新资源文件{latestVersionString}...";
         if (!await DownloadAndExtractFile(downloadUrl, tempFileDirectory, tempFileName))
         {
             if (needPrintLog)
                 Utility.PrintLog($"资源文件文件下载失败");
-            MainViewModel.Instance.ProgramData.UpdateInfo = "资源文件文件下载失败！";
+            MainViewModel.Instance.ProgramData.UpdateTaskInfo = "资源文件文件下载失败！";
             Utility.CustomDebugWriteLine("资源文件文件下载失败");
             MainViewModel.Instance.ProgramData.IsDownloadingFiles = false;
             return;
         }
-        MainViewModel.Instance.ProgramData.UpdateInfo = $"资源文件下载完成，正在自动更新...";
+        MainViewModel.Instance.ProgramData.UpdateTaskInfo = $"资源文件下载完成，正在自动更新...";
         Utility.CustomDebugWriteLine($"{tempFileName}下载+解压完成，自动更新资源文件");
 
         // 生成update.bat文件执行文件删除+复制。不处理model文件夹
@@ -395,7 +404,7 @@ public static class UpdateTool
         Process.Start(psi);
         if (needPrintLog)
             Utility.PrintLog($"资源文件更新完成");
-        MainViewModel.Instance.ProgramData.UpdateInfo = "资源文件更新完成";
+        MainViewModel.Instance.ProgramData.UpdateTaskInfo = "资源文件更新完成";
         Utility.CustomDebugWriteLine($"资源文件更新完成");
         MainViewModel.Instance.ProgramData.IsDownloadingFiles = false;
         MainViewModel.Instance.ProgramData.HasNewVersion = false;
