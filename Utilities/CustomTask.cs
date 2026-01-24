@@ -76,10 +76,16 @@ public static class CustomTask
                 Utility.CustomDebugWriteLine("识别结果的json解析为空 | JObject is null");
                 return false;
             }
-            var currentMaxHit = dateRoot["max_hit"];
-            if (currentMaxHit == null)
+            var currentMaxHitJToken = dateRoot["max_hit"];
+            if (currentMaxHitJToken == null)
             {
                 Utility.CustomDebugWriteLine("找不到max_hit节点");
+                return false;
+            }
+            var currentMaxHit = (uint)currentMaxHitJToken;
+            if (currentMaxHit > 4)
+            {
+                Utility.CustomDebugWriteLine("Commission@RecogniseLabel节点的currentMaxHit>4");
                 return false;
             }
             int newMaxHit = (int)currentMaxHit - count;
@@ -131,8 +137,11 @@ public static class CustomTask
         public string Name { get; set; } = nameof(CustomCreateCommissionTaskChain);
         public bool Run(in IMaaContext context, in RunArgs args, in RunResults results)
         {
-            TaskManager.Instance.CreateCommissionTaskChain();
-            return true;
+            if (TaskManager.Instance.CreateCommissionTaskChain())
+            {
+                return true;
+            }
+            return false;
         }
     }
 

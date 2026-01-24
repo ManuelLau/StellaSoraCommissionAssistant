@@ -3,8 +3,8 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": 596,
-				"y": -73,
+				"x": 724,
+				"y": 239,
 				"zoom": 1.26
 			},
 			"filename": "Utility",
@@ -27,8 +27,40 @@
 		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
-				"x": 29,
-				"y": 341
+				"x": 253,
+				"y": 0
+			}
+		}
+	},
+	"StopTask": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "StopTask",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 0,
+				"y": 224
+			}
+		}
+	},
+	"BlankNode": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 0,
+				"y": 380
 			}
 		}
 	},
@@ -51,8 +83,8 @@
 		"doc": "关闭一切获得奖励的界面，包括月卡奖励等",
 		"$__mpe_code": {
 			"position": {
-				"x": 298,
-				"y": 317
+				"x": -249,
+				"y": 1
 			}
 		}
 	},
@@ -70,24 +102,8 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": -238,
-				"y": 461
-			}
-		}
-	},
-	"StopTask": {
-		"recognition": {
-			"type": "DirectHit",
-			"param": {}
-		},
-		"action": {
-			"type": "StopTask",
-			"param": {}
-		},
-		"$__mpe_code": {
-			"position": {
-				"x": -241,
-				"y": 330
+				"x": 0,
+				"y": 0
 			}
 		}
 	}

@@ -3,9 +3,9 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": -577,
-				"y": -1286,
-				"zoom": 0.99
+				"x": -410,
+				"y": 28,
+				"zoom": 0.79
 			},
 			"filename": "Commission",
 			"version": "v0.16.0"
@@ -188,14 +188,14 @@
 				}
 			}
 		},
-		"timeout": 1000,
+		"timeout": 2000,
 		"$__mpe_code": {
 			"position": {
 				"x": 1217,
 				"y": 350
 			}
 		},
-		"next": ["Commission@GoToNextClass"]
+		"next": ["Commission@GoToNextClass", "BlankNode"]
 	},
 	"Commission@Incomplete": {
 		"recognition": {
@@ -837,6 +837,14 @@
 			"position": {
 				"x": 1671,
 				"y": 2063
+			}
+		}
+	},
+	"$__mpe_external_BlankNode_Commission": {
+		"$__mpe_code": {
+			"position": {
+				"x": 1558,
+				"y": 881
 			}
 		}
 	}

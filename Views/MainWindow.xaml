@@ -102,7 +102,7 @@
                         </Grid>
 
                         <hc:ScrollViewer Grid.Column="1" Margin="4 10 8 10" VerticalAlignment="Top" VerticalContentAlignment="Top"
-                                         HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True" MinHeight="450"
+                                         HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True" MinHeight="430"
                                          hc:ScrollViewerAttach.AutoHide="False" utilities:AutoScrollToBottom.AlwaysScrollToBottom="True">
                             <ItemsControl ItemsSource="{Binding LogDataList}">
                                 <ItemsControl.ItemTemplate>

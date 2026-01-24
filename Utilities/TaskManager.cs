@@ -615,7 +615,7 @@ public class TaskManager
         _lastTaskDurationInHours = hours;
     }
 
-    public void CreateCommissionTaskChain()
+    public bool CreateCommissionTaskChain()
     {
         DateTime dateTime;
         if (_commissionCompleteDateTime.Count != 0 && _lastTaskDurationInHours == 0)
@@ -643,8 +643,9 @@ public class TaskManager
         }
         else
         {
+            Utility.PrintError("时间识别出错");
             Utility.CustomDebugWriteLine("CreateCommissionTaskChain - dateTime错误！");
-            return;
+            return false;
         }
         Queue<TaskModel> tempQueue = new();
         tempQueue.Enqueue(new("进入委托界面", "CommissionEnter", string.Empty, ETaskType.Normal));
@@ -655,6 +656,7 @@ public class TaskManager
         SortWaitingTaskChainList();
         _commissionCompleteDateTime.Clear();
         _lastTaskDurationInHours = 0;
+        return true;
     }
 
     public void DelayTaskChain(DateTime openDateTime)
