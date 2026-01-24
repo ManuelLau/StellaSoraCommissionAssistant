@@ -1,6 +1,7 @@
 ﻿using MaaFramework.Binding;
 using MaaFramework.Binding.Custom;
 using Newtonsoft.Json.Linq;
+using StellaSoraCommissionAssistant.Models;
 
 namespace StellaSoraCommissionAssistant.Utilities;
 
@@ -66,6 +67,27 @@ public static class CustomTask
 
                 TaskManager.Instance.AddCommissionCompleteTime(DateTime.Now + remainingTimeOnly.ToTimeSpan(), isCustomDispatch);
             }
+            // 重置hit次数，修改max_hit数值
+            context.ClearHitCount("Commission@RecogniseLabel");
+            context.GetNodeData("Commission@RecogniseLabel", out string? data);
+            JObject? dateRoot = JObject.Parse(data ?? "");
+            if (dateRoot == null)
+            {
+                Utility.CustomDebugWriteLine("识别结果的json解析为空 | JObject is null");
+                return false;
+            }
+            var currentMaxHit = dateRoot["max_hit"];
+            if (currentMaxHit == null)
+            {
+                Utility.CustomDebugWriteLine("找不到max_hit节点");
+                return false;
+            }
+            int newMaxHit = (int)currentMaxHit - count;
+            if (newMaxHit <= 0)
+            {
+                context.OverridePipeline("{\"Commission@GoToNextClass\":{\"max_hit\":0}}");
+            }
+            context.OverridePipeline("{\"Commission@RecogniseLabel\":{\"max_hit\":"+ newMaxHit + "}}");
             return true;
         }
     }
@@ -119,7 +141,7 @@ public static class CustomTask
         public string Name { get; set; } = nameof(CustomDispatchFailed);
         public bool Run(in IMaaContext context, in RunArgs args, in RunResults results)
         {
-            Utility.PrintError("委托派遣失败，未满足委托要求");
+            Utility.PrintError("委托派遣失败，未满足委托要求或时长设置错误");
             return true;
         }
     }
@@ -131,6 +153,25 @@ public static class CustomTask
         {
             string result = GetFilteredNodeContent(args, 0, "text");
             Utility.PrintLog("好友体力已领取" + result);
+            return true;
+        }
+    }
+
+    public class CustomRepeatedLoginStopTask : IMaaCustomAction
+    {
+        public string Name { get; set; } = nameof(CustomRepeatedLoginStopTask);
+        public bool Run(in IMaaContext context, in RunArgs args, in RunResults results)
+        {
+            if (ProgramDataModel.Instance.SettingsData.IsStopTaskWhenLoginRepeatedly)
+            {
+
+                Utility.PrintLog("发现重复登录，即将停止任务");
+                TaskManager.Instance.Stop(true);
+            }
+            else
+            {
+                Utility.PrintLog("发现重复登录，重新登录中");
+            }
             return true;
         }
     }

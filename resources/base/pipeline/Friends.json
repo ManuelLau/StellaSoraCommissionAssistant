@@ -3,8 +3,8 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": 207,
-				"y": 221,
+				"x": -679,
+				"y": 284,
 				"zoom": 1.25
 			},
 			"filename": "Friends",
@@ -64,7 +64,7 @@
 			"type": "TemplateMatch",
 			"param": {
 				"roi": [1040, 0, 100, 100],
-				"template": ["FriendsButton.png"],
+				"template": ["FriendsEntry0.png", "FriendsEntry1.png"],
 				"green_mask": true,
 				"threshold": [0.9]
 			}
@@ -76,8 +76,8 @@
 		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
-				"x": 300,
-				"y": 220
+				"x": 296,
+				"y": 181
 			}
 		}
 	},
@@ -108,8 +108,8 @@
 	"$__mpe_external_ClickHomeButton_Friends": {
 		"$__mpe_code": {
 			"position": {
-				"x": 303,
-				"y": 538
+				"x": 300,
+				"y": 506
 			}
 		}
 	},
@@ -130,16 +130,37 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 926,
-				"y": 8
+				"x": 944,
+				"y": 1
 			}
-		}
+		},
+		"next": ["Friends@RecogniseTitleAndEnd"]
 	},
 	"$__mpe_external_ObtainReward_Friends": {
 		"$__mpe_code": {
 			"position": {
-				"x": 935,
-				"y": 290
+				"x": 950,
+				"y": 267
+			}
+		}
+	},
+	"Friends@RecogniseTitleAndEnd": {
+		"recognition": {
+			"type": "TemplateMatch",
+			"param": {
+				"template": ["FriendsTitle.png"],
+				"roi": [0, 0, 300, 100],
+				"threshold": [0.9]
+			}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 1255,
+				"y": 11
 			}
 		}
 	},

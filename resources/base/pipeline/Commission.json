@@ -3,9 +3,9 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": 154,
-				"y": 33,
-				"zoom": 1.25
+				"x": -577,
+				"y": -1286,
+				"zoom": 0.99
 			},
 			"filename": "Commission",
 			"version": "v0.16.0"
@@ -30,7 +30,8 @@
 				"y": 1699
 			}
 		},
-		"next": ["Commission@SelectTime"]
+		"next": ["Commission@SelectTime"],
+		"on_error": ["Commission@CustomDispatchFailed"]
 	},
 	"Commission@SelectTime": {
 		"recognition": {
@@ -67,7 +68,8 @@
 			"type": "Click",
 			"param": {}
 		},
-		"timeout": 4000,
+		"timeout": 3000,
+		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
 				"x": 1401,
@@ -85,7 +87,7 @@
 			"type": "TemplateMatch",
 			"param": {
 				"roi": [1100, 0, 180, 180],
-				"template": ["CommissionButton.png"],
+				"template": ["CommissionEntry.png"],
 				"green_mask": true
 			}
 		},
@@ -193,15 +195,14 @@
 				"y": 350
 			}
 		},
-		"next": ["Commission@GoToNextClass"],
-		"on_error": ["Commission@Stop"]
+		"next": ["Commission@GoToNextClass"]
 	},
 	"Commission@Incomplete": {
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
 				"roi": [1040, 590, 240, 100],
-				"template": ["CommissionClaimAllNo.png"]
+				"template": ["CommissionClaimAllDisable.png"]
 			}
 		},
 		"action": {
@@ -229,7 +230,7 @@
 			"param": {}
 		},
 		"max_hit": 4,
-		"doc": "识别左侧状态图标来判断是否已完成",
+		"doc": "识别左侧状态图标来判断是否已完成。注意：代码中需要用到此节点的名字",
 		"$__mpe_code": {
 			"position": {
 				"x": 943,
@@ -255,6 +256,7 @@
 		},
 		"post_delay": 1000,
 		"max_hit": 3,
+		"doc": "注意：代码中需要用到此节点的名字",
 		"$__mpe_code": {
 			"position": {
 				"x": 1553,
@@ -284,15 +286,14 @@
 			"type": "TemplateMatch",
 			"param": {
 				"roi": [1040, 590, 240, 100],
-				"template": ["CommissionClaimAllYes.png"]
+				"template": ["CommissionClaimAllAble.png"]
 			}
 		},
 		"action": {
 			"type": "Click",
 			"param": {}
 		},
-		"post_delay": 3000,
-		"timeout": 2000,
+		"post_delay": 2000,
 		"$__mpe_code": {
 			"position": {
 				"x": 296,
@@ -306,8 +307,16 @@
 		{
 			"name": "ObtainReward",
 			"jump_back": true
-		}],
-		"on_error": ["Commission@NextTask"]
+		},
+		{
+			"name": "Commission@RecogniseLastTaskDuration",
+			"jump_back": true
+		},
+		{
+			"name": "Commission@ClickWhenComplete",
+			"jump_back": true
+		},
+		"Commission@End"]
 	},
 	"Commission@SkipDialogue": {
 		"recognition": {
@@ -321,19 +330,18 @@
 			"type": "Click",
 			"param": {}
 		},
-		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
-				"x": 851,
-				"y": 710
+				"x": 927,
+				"y": 681
 			}
 		}
 	},
 	"$__mpe_external_ObtainReward_Commission": {
 		"$__mpe_code": {
 			"position": {
-				"x": 854,
-				"y": 965
+				"x": 944,
+				"y": 889
 			}
 		}
 	},
@@ -342,6 +350,7 @@
 			"type": "TemplateMatch",
 			"param": {
 				"template": ["CommissionTitle.png"],
+				"roi": [0, 0, 300, 100],
 				"threshold": [0.9]
 			}
 		},
@@ -353,32 +362,31 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 1677,
-				"y": 1122
+				"x": 1336,
+				"y": 1292
 			}
 		},
 		"next": ["StopTask"]
 	},
-	"Commission@DispatchAgain": {
+	"Commission@ClickWhenComplete": {
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
 				"template": ["CommissionDispatchAgain.png"],
-				"roi": [620, 490, 320, 200]
+				"roi": [340, 500, 600, 140]
 			}
 		},
 		"action": {
 			"type": "Click",
 			"param": {}
 		},
-		"post_delay": 2000,
+		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
-				"x": 1198,
-				"y": 1066
+				"x": 949,
+				"y": 994
 			}
-		},
-		"next": ["Commission@End"]
+		}
 	},
 	"Commission@SelectClass0": {
 		"recognition": {
@@ -418,30 +426,13 @@
 				"custom_action": "CustomRecogniseLastTaskDuration"
 			}
 		},
+		"max_hit": 1,
 		"$__mpe_code": {
 			"position": {
-				"x": 866,
-				"y": 1047
+				"x": 1206,
+				"y": 762
 			}
-		},
-		"next": ["Commission@DispatchAgain"]
-	},
-	"Commission@NextTask": {
-		"recognition": {
-			"type": "DirectHit",
-			"param": {}
-		},
-		"action": {
-			"type": "DoNothing",
-			"param": {}
-		},
-		"$__mpe_code": {
-			"position": {
-				"x": 595,
-				"y": 1016
-			}
-		},
-		"next": ["Commission@RecogniseLastTaskDuration"]
+		}
 	},
 	"$__mpe_external_ClickConfirmButton_Commission": {
 		"$__mpe_code": {
@@ -451,18 +442,19 @@
 			}
 		}
 	},
-	"Commission@RecogniseBackButton": {
+	"Commission@CustomDispatchStart": {
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
-				"template": ["ReturnButton.png"]
+				"template": ["CommissionTitle.png"],
+				"roi": [0, 0, 300, 100],
+				"threshold": [0.9]
 			}
 		},
 		"action": {
-			"type": "Click",
+			"type": "DoNothing",
 			"param": {}
 		},
-		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
 				"x": -627,
@@ -486,72 +478,6 @@
 			"jump_back": true
 		},
 		"Commission@End"]
-	},
-	"Commission@CustomDispatch1": {
-		"recognition": {
-			"type": "DirectHit",
-			"param": {}
-		},
-		"action": {
-			"type": "DoNothing",
-			"param": {}
-		},
-		"max_hit": 1,
-		"$__mpe_code": {
-			"position": {
-				"x": 22,
-				"y": 1622
-			}
-		},
-		"next": [{
-			"name": "Commission@SelectClass1",
-			"jump_back": true
-		},
-		"Commission@RecogniseType1"]
-	},
-	"Commission@CustomDispatch2": {
-		"recognition": {
-			"type": "DirectHit",
-			"param": {}
-		},
-		"action": {
-			"type": "DoNothing",
-			"param": {}
-		},
-		"max_hit": 1,
-		"$__mpe_code": {
-			"position": {
-				"x": 24,
-				"y": 1813
-			}
-		},
-		"next": [{
-			"name": "Commission@SelectClass2",
-			"jump_back": true
-		},
-		"Commission@RecogniseType2"]
-	},
-	"Commission@CustomDispatch3": {
-		"recognition": {
-			"type": "DirectHit",
-			"param": {}
-		},
-		"action": {
-			"type": "DoNothing",
-			"param": {}
-		},
-		"max_hit": 1,
-		"$__mpe_code": {
-			"position": {
-				"x": 29,
-				"y": 2004
-			}
-		},
-		"next": [{
-			"name": "Commission@SelectClass3",
-			"jump_back": true
-		},
-		"Commission@RecogniseType3"]
 	},
 	"Commission@SelectClass1": {
 		"recognition": {
@@ -753,7 +679,7 @@
 		"timeout": 1000,
 		"$__mpe_code": {
 			"position": {
-				"x": 591,
+				"x": 605,
 				"y": 527
 			}
 		},
@@ -764,8 +690,8 @@
 		{
 			"name": "Commission@GoToNextClass",
 			"jump_back": true
-		}],
-		"on_error": ["Commission@End"]
+		},
+		"Commission@End"]
 	},
 	"Commission@RecallButton": {
 		"recognition": {
@@ -782,8 +708,8 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 1016,
-				"y": 2012
+				"x": 1064,
+				"y": 1995
 			}
 		},
 		"next": ["Commission@CustomDispatchAddRemainingTime"]
@@ -796,7 +722,15 @@
 			}
 		}
 	},
-	"Commission@Stop": {
+	"$__mpe_external_StopTask_Commission": {
+		"$__mpe_code": {
+			"position": {
+				"x": 1605,
+				"y": 1334
+			}
+		}
+	},
+	"Commission@CustomDispatch1": {
 		"recognition": {
 			"type": "DirectHit",
 			"param": {}
@@ -805,21 +739,62 @@
 			"type": "DoNothing",
 			"param": {}
 		},
+		"max_hit": 1,
 		"$__mpe_code": {
 			"position": {
-				"x": 1454,
-				"y": 876
+				"x": 22,
+				"y": 1622
 			}
 		},
-		"next": ["Commission@End"]
+		"next": [{
+			"name": "Commission@SelectClass1",
+			"jump_back": true
+		},
+		"Commission@RecogniseType1"]
 	},
-	"$__mpe_external_StopTask_Commission": {
+	"Commission@CustomDispatch2": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"max_hit": 1,
 		"$__mpe_code": {
 			"position": {
-				"x": 1972,
-				"y": 1170
+				"x": 24,
+				"y": 1813
 			}
-		}
+		},
+		"next": [{
+			"name": "Commission@SelectClass2",
+			"jump_back": true
+		},
+		"Commission@RecogniseType2"]
+	},
+	"Commission@CustomDispatch3": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "DoNothing",
+			"param": {}
+		},
+		"max_hit": 1,
+		"$__mpe_code": {
+			"position": {
+				"x": 29,
+				"y": 2004
+			}
+		},
+		"next": [{
+			"name": "Commission@SelectClass3",
+			"jump_back": true
+		},
+		"Commission@RecogniseType3"]
 	},
 	"Commission@CustomDispatchAddRemainingTime": {
 		"recognition": {

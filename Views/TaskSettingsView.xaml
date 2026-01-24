@@ -102,6 +102,9 @@
                 <CheckBox Content="完成任务后退出游戏" Margin="0 10 0 10" HorizontalAlignment="Center" VerticalAlignment="Center"
                           IsChecked="{Binding ProgramData.SettingsData.IsCloseGameAfterFinishingTask}"
                           Click="SettingsCheckBoxClick"/>
+                <CheckBox Content="检测到重复登录后自动停止任务" Margin="0 10 0 10" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          IsChecked="{Binding ProgramData.SettingsData.IsStopTaskWhenLoginRepeatedly}"
+                          Click="SettingsCheckBoxClick" IsEnabled="{c:Binding !ProgramData.IsCurrentTaskExecuting}"/>
             </StackPanel>
         </hc:ScrollViewer>
     </Grid>

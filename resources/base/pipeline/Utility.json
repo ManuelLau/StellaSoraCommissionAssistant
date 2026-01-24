@@ -36,7 +36,7 @@
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
-				"roi": [0, 500, 0, 220],
+				"roi": [0, 500, 1280, 220],
 				"template": ["ClickToReceive.png", "ClickToContinue.png"],
 				"green_mask": true
 			}
@@ -44,7 +44,7 @@
 		"action": {
 			"type": "Click",
 			"param": {
-				"target": [640, 600, 10, 10]
+				"target": [640, 610, 10, 0]
 			}
 		},
 		"post_delay": 1000,

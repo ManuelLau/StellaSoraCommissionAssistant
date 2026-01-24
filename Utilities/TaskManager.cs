@@ -109,6 +109,7 @@ public class TaskManager
         //tempQueue = new([new("Test", "HomeScreen@ClickExitButton", string.Empty, ETaskType.Normal)]);
         //AddToWaitingTaskChainList(new("Test", DateTime.Now, true, true, true, tempQueue));
         SortWaitingTaskChainList();
+        CheckCommissionRationality();
     }
 
     // 初始化MaaTasker，自动连接客户端和Maa资源
@@ -160,6 +161,7 @@ public class TaskManager
             _maaTasker.Resource.Register(new CustomCreateCommissionTaskChain());
             _maaTasker.Resource.Register(new CustomDispatchFailed());
             _maaTasker.Resource.Register(new CustomLogFriendEnergy());
+            _maaTasker.Resource.Register(new CustomRepeatedLoginStopTask());
             _maaTasker.Resource.Register(new CustomMaintenanceDelayTaskChain());
             _maaTasker.Resource.Register(new CustomAppendRestartClientTask());
             //_maaTasker.Resource.Register(new CustomClientUpdateStopTask());
@@ -524,6 +526,7 @@ public class TaskManager
             Queue<TaskModel> tempQueue = new();
             tempQueue.Enqueue(new("领取好友体力", "AcquireFriendsEnergy", string.Empty, ETaskType.AcquireFriendsEnergy));
             AddToWaitingTaskChainList(new("领取好友体力", dateTime, true, true, true, tempQueue));
+            SortWaitingTaskChainList();
         }
     }
 
@@ -535,8 +538,8 @@ public class TaskManager
             string overrideJson = "{";
             if (_settingsData.CommissionDispatchTypeSettingIndex == (int)ECommissionDispatchTypeSettingOptions.Custom)
             {
-                overrideJson += "\"Commission@NextTask\":{\"next\":\"Commission@RecogniseBackButton\"}";
-
+                overrideJson += "\"Commission@Complete\":{\"next\":[{\"name\":\"Commission@SkipDialogue\",\"jump_back\":true},{\"name\":\"ObtainReward\",\"jump_back\":true},{\"name\":\"Commission@ClickWhenComplete\",\"jump_back\":true},\"Commission@CustomDispatchStart\"]}";
+                overrideJson += ",\"Commission@ClickWhenComplete\":{\"recognition\":{\"param\":{\"template\":[\"ReturnButton.png\"]}}}";
                 for (int i = 0; i < 4; i++)
                 {
                     string templateName = $"CommissionClass{_settingsData.CommissionTaskTypeSettingIndexs[i] / 6}.png";
@@ -702,5 +705,42 @@ public class TaskManager
         Queue<TaskModel> tempQueue = new();
         tempQueue.Enqueue(new("重启游戏", "HomeScreen", string.Empty, ETaskType.HomeScreen));
         _executingTaskChainList.Insert(1, new("重启游戏", DateTime.Now, false, false, true, tempQueue));
+    }
+
+    private void CheckCommissionRationality()
+    {
+        // 检查委托任务时间设置是否合理:卡带委托任务时长不能为4、8小时
+        if ((ECommissionDispatchTypeSettingOptions)_settingsData.CommissionDispatchTypeSettingIndex == ECommissionDispatchTypeSettingOptions.Custom)
+        {
+            var enumValue = ((ECommissionDurationSettingOptions[])Enum.GetValues(typeof(ECommissionDurationSettingOptions)))[_settingsData.CommissionDurationSettingIndex];
+            switch (enumValue)
+            {
+                case ECommissionDurationSettingOptions.Hours4:
+                    foreach (var e in _settingsData.CommissionTaskTypeSettingIndexs)
+                    {
+                        if (e >= (int)ECommissionTypeSettingOptions.D1)
+                        {
+                            Utility.PrintError("游戏卡带委托任务时长不能为4小时，请修改设置");
+                            break;
+                        }
+                    }
+                    break;
+                case ECommissionDurationSettingOptions.Hours8:
+                    foreach (var e in _settingsData.CommissionTaskTypeSettingIndexs)
+                    {
+                        if (e >= (int)ECommissionTypeSettingOptions.D1)
+                        {
+                            Utility.PrintError("游戏卡带委托任务时长不能为8小时，请修改设置");
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+        // 检查委托任务是否有重复
+        if (_settingsData.CommissionTaskTypeSettingIndexs.Length != _settingsData.CommissionTaskTypeSettingIndexs.Distinct().Count())
+        {
+            Utility.PrintError("委托任务重复，请修改设置");
+        }
     }
 }

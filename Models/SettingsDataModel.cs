@@ -9,11 +9,12 @@ public partial class SettingsDataModel : ObservableObject
     public int ClientTypeSettingIndex { get; set; } = (int)EClientTypeSettingOptions.Zh_CN_PC;
     [ObservableProperty]
     public int commissionDispatchTypeSettingIndex = (int)ECommissionDispatchTypeSettingOptions.Repeat;
-    public int CommissionDurationSettingIndex { get; set; } = (int)ECommissionDurationSettingOptions.Hours4;
-    public int[] CommissionTaskTypeSettingIndexs { get; set; } = [0, 0, 0, 0];
+    public int CommissionDurationSettingIndex { get; set; } = (int)ECommissionDurationSettingOptions.Hours12;
+    public int[] CommissionTaskTypeSettingIndexs { get; set; } = [6, 7, 8, 12];
     public bool IsAcquireFriendEnergy { get; set; } = false;
     public TimeOnly AcquireFriendEnergyTime { get; set; } = TimeOnly.Parse("23:30:00");
     public bool IsCloseGameAfterFinishingTask { get; set; } = false;
+    public bool IsStopTaskWhenLoginRepeatedly { get; set; } = true;
     public bool IsAutoCheckAppUpdate { get; set; } = false;
     [ObservableProperty][JsonIgnore]
     public string gamePath = string.Empty;

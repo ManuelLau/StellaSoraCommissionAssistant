@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using StellaSoraCommissionAssistant.Utilities;
 using StellaSoraCommissionAssistant.ViewModels;
+using System.Windows;
 using System.Windows.Input;
 
 namespace StellaSoraCommissionAssistant.Views;
@@ -26,7 +27,7 @@ public partial class MainWindow
         e.Handled = true;
     }
 
-    public void DeleteTaskChain(object sender, System.Windows.RoutedEventArgs e)
+    public void DeleteTaskChain(object sender, RoutedEventArgs e)
     {
         if (sender is System.Windows.Controls.Button button)
         {
@@ -35,7 +36,7 @@ public partial class MainWindow
         }
     }
 
-    private void TextBoxLostFocus(object sender, System.Windows.RoutedEventArgs e)
+    private void TextBoxLostFocus(object sender, RoutedEventArgs e)
     {
         TaskManager.Instance.SortWaitingTaskChainList();
     }
@@ -48,6 +49,14 @@ public partial class MainWindow
             MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
             e.Handled = true;
         }
+    }
+
+    private void MenuItemClick(object sender, RoutedEventArgs e)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            MainViewModel.Instance.LogDataList.Clear();
+        });
     }
 
 #if DEBUG

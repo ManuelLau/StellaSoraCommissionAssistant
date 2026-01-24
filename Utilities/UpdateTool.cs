@@ -294,7 +294,7 @@ public static class UpdateTool
             Utility.CustomDebugWriteLine("检查软件新版本号出错! - UpdateApp()");
             return string.Empty;
         }
-        Utility.CustomDebugWriteLine($"开始下载更新 - 由v{Constants.AppVersion}更新至{latestVersionString}");
+        Utility.CustomDebugWriteLine($"开始下载软件更新 - 由v{Constants.AppVersion}更新至{latestVersionString}");
         Utility.CustomDebugWriteLine("DownloadUrl:" + downloadUrl);
         // 创建临时文件存放路径temp\
         var tempFileDirectory = @".\temp";

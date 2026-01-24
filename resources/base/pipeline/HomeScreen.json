@@ -3,9 +3,9 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": 395,
-				"y": -554,
-				"zoom": 0.75
+				"x": 67,
+				"y": -1039,
+				"zoom": 0.94
 			},
 			"filename": "HomeScreen",
 			"version": "v0.16.0"
@@ -47,7 +47,7 @@
 			"jump_back": true
 		},
 		"HomeScreen@MaintenancePopup", {
-			"name": "HomeScreen@ServerNoResponse",
+			"name": "HomeScreen@RepeatedLogin",
 			"jump_back": true
 		},
 		"HomeScreen@UpdateFinished", {
@@ -59,7 +59,7 @@
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
-				"template": ["MenuButton.png"],
+				"template": ["MenuButton0.png", "MenuButton1.png"],
 				"roi": [1180, 0, 100, 100],
 				"threshold": 0.9
 			}
@@ -72,8 +72,8 @@
 		"timeout": 2000,
 		"$__mpe_code": {
 			"position": {
-				"x": 300,
-				"y": 0
+				"x": 297,
+				"y": -45
 			}
 		},
 		"next": ["HomeScreen@RecogniseMenuButtonAgain"],
@@ -83,7 +83,7 @@
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
-				"template": ["MenuButton.png"],
+				"template": ["MenuButton0.png", "MenuButton1.png"],
 				"roi": [1180, 0, 100, 100],
 				"threshold": 0.9
 			}
@@ -296,11 +296,11 @@
 			}
 		}
 	},
-	"HomeScreen@ServerNoResponse": {
+	"HomeScreen@RepeatedLogin": {
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
-				"template": ["ServerNoResponse.png"],
+				"template": ["RepeatedLogin.png"],
 				"threshold": 0.9,
 				"roi": [304, 146, 672, 422]
 			}
@@ -315,9 +315,9 @@
 				"y": 1436
 			}
 		},
-		"next": ["HomeScreen@ReturnToLogin"]
+		"next": ["HomeScreen@RepeatedLoginReturn"]
 	},
-	"HomeScreen@ReturnToLogin": {
+	"HomeScreen@RepeatedLoginReturn": {
 		"recognition": {
 			"type": "TemplateMatch",
 			"param": {
@@ -330,13 +330,13 @@
 			"type": "Click",
 			"param": {}
 		},
-		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
 				"x": 577,
 				"y": 1448
 			}
-		}
+		},
+		"next": ["HomeScreen@RepeatedLoginStopTask"]
 	},
 	"$__mpe_external_ObtainReward_HomeScreen": {
 		"$__mpe_code": {
@@ -396,8 +396,8 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 571,
-				"y": 1745
+				"x": 576,
+				"y": 1740
 			}
 		},
 		"next": ["HomeScreen@ClickExitButton"]
@@ -420,6 +420,24 @@
 			"position": {
 				"x": 872,
 				"y": 1681
+			}
+		}
+	},
+	"HomeScreen@RepeatedLoginStopTask": {
+		"recognition": {
+			"type": "DirectHit",
+			"param": {}
+		},
+		"action": {
+			"type": "Custom",
+			"param": {
+				"custom_action": "CustomRepeatedLoginStopTask"
+			}
+		},
+		"$__mpe_code": {
+			"position": {
+				"x": 845,
+				"y": 1469
 			}
 		}
 	}

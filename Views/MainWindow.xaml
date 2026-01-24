@@ -102,7 +102,7 @@
                         </Grid>
 
                         <hc:ScrollViewer Grid.Column="1" Margin="4 10 8 10" VerticalAlignment="Top" VerticalContentAlignment="Top"
-                                         HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True"
+                                         HorizontalScrollBarVisibility="Disabled" IsInertiaEnabled="True" MinHeight="450"
                                          hc:ScrollViewerAttach.AutoHide="False" utilities:AutoScrollToBottom.AlwaysScrollToBottom="True">
                             <ItemsControl ItemsSource="{Binding LogDataList}">
                                 <ItemsControl.ItemTemplate>
@@ -115,6 +115,11 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            <hc:ScrollViewer.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="清屏" Click="MenuItemClick" Width="100"/>
+                                </ContextMenu>
+                            </hc:ScrollViewer.ContextMenu>
                         </hc:ScrollViewer>
                     </Grid>
                 </TabItem>

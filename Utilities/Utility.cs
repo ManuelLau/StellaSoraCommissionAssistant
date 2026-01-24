@@ -92,7 +92,7 @@ public static class Utility
         <head>
             <meta charset=""utf-8"">
             <meta name=""viewport"" content=""width=device-width, initial-scale=1"">
-            <title>""Title""</title>
+            <title>""</title>
             <style>
                 {0}
             </style>
