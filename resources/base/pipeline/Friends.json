@@ -3,9 +3,9 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": -679,
-				"y": 284,
-				"zoom": 1.25
+				"x": 310,
+				"y": 185,
+				"zoom": 0.99
 			},
 			"filename": "Friends",
 			"version": "v0.16.0"
@@ -23,7 +23,7 @@
 		"$__mpe_code": {
 			"position": {
 				"x": 0,
-				"y": 53
+				"y": 99
 			}
 		},
 		"next": ["Friends@RecogniseTitle", {
@@ -50,8 +50,8 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 298,
-				"y": -52
+				"x": 300,
+				"y": 43
 			}
 		},
 		"next": ["Friends@AcquireAll", {
@@ -76,8 +76,8 @@
 		"post_delay": 1000,
 		"$__mpe_code": {
 			"position": {
-				"x": 296,
-				"y": 181
+				"x": 300,
+				"y": 310
 			}
 		}
 	},
@@ -93,54 +93,32 @@
 			"type": "Click",
 			"param": {}
 		},
-		"post_delay": 1000,
+		"post_delay": 2000,
 		"$__mpe_code": {
 			"position": {
 				"x": 600,
-				"y": 0
+				"y": 37
 			}
 		},
 		"next": ["Friends@LogFriendEnergy", {
 			"name": "ObtainReward",
 			"jump_back": true
-		}]
+		},
+		"Friends@RecogniseTitleAndEnd"]
 	},
 	"$__mpe_external_ClickHomeButton_Friends": {
 		"$__mpe_code": {
 			"position": {
-				"x": 300,
-				"y": 506
+				"x": 305,
+				"y": 667
 			}
 		}
-	},
-	"Friends@LogFriendEnergy": {
-		"recognition": {
-			"type": "OCR",
-			"param": {
-				"expected": ["/"],
-				"replace": [["'", ""]],
-				"roi": [756, 630, 120, 70]
-			}
-		},
-		"action": {
-			"type": "Custom",
-			"param": {
-				"custom_action": "CustomLogFriendEnergy"
-			}
-		},
-		"$__mpe_code": {
-			"position": {
-				"x": 944,
-				"y": 1
-			}
-		},
-		"next": ["Friends@RecogniseTitleAndEnd"]
 	},
 	"$__mpe_external_ObtainReward_Friends": {
 		"$__mpe_code": {
 			"position": {
-				"x": 950,
-				"y": 267
+				"x": 905,
+				"y": 353
 			}
 		}
 	},
@@ -159,8 +137,8 @@
 		},
 		"$__mpe_code": {
 			"position": {
-				"x": 1255,
-				"y": 11
+				"x": 900,
+				"y": 463
 			}
 		}
 	},
@@ -180,7 +158,30 @@
 		"$__mpe_code": {
 			"position": {
 				"x": 600,
-				"y": 239
+				"y": 316
+			}
+		}
+	},
+	"Friends@LogFriendEnergy": {
+		"recognition": {
+			"type": "OCR",
+			"param": {
+				"expected": ["/"],
+				"roi": [756, 630, 120, 70],
+				"replace": [["'", ""]]
+			}
+		},
+		"action": {
+			"type": "Custom",
+			"param": {
+				"custom_action": "CustomLogFriendEnergy"
+			}
+		},
+		"max_hit": 1,
+		"$__mpe_code": {
+			"position": {
+				"x": 900,
+				"y": 0
 			}
 		}
 	}

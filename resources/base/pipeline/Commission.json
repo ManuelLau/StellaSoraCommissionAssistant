@@ -3,9 +3,9 @@
 		"$__mpe_code": {
 			"prefix": "",
 			"savedViewport": {
-				"x": -410,
-				"y": 28,
-				"zoom": 0.79
+				"x": -917,
+				"y": -1800,
+				"zoom": 1.25
 			},
 			"filename": "Commission",
 			"version": "v0.16.0"
@@ -801,9 +801,9 @@
 			"type": "OCR",
 			"param": {
 				"roi": [780, 460, 466, 130],
-				"expected": ["委托中"],
+				"expected": ["托中"],
 				"replace": [["'", ""]],
-				"threshold": 0.8
+				"threshold": 0.5
 			}
 		},
 		"action": {

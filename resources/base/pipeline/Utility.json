@@ -76,7 +76,7 @@
 		"action": {
 			"type": "Click",
 			"param": {
-				"target": [640, 610, 10, 0]
+				"target_offset": [0, 30, 10, 10]
 			}
 		},
 		"post_delay": 1000,
