@@ -68,8 +68,8 @@ public partial class SettingsViewModel : ObservableObject
     {
         OpenFileDialog openFileDialog = new()
         {
-            Filter = "Executable Files (*.exe)|*.exe",
-            Title = "选择客户端路径"
+            Filter = "应用程序(*.exe)|*.exe",
+            Title = "选择程序"
         };
 
         // 显示对话框并检查用户是否选择了文件
